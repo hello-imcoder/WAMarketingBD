@@ -1,0 +1,11 @@
+-- supabase/seed.sql
+-- Seed data for local development — applied after migrations.
+-- Milestone 2: will include:
+--   1. site_settings singleton row (min_withdrawal_amount, referral_bonus_amount)
+--   2. su_admin user bootstrap (using SU_ADMIN_EMAIL from SECRETS.md)
+--
+-- Run against local or remote DB:
+--   psql "$POSTGRES_CONNECTION_STRING" -f supabase/seed.sql
+--
+-- NOTE: Never embed real credentials here. Use SECRETS.md values via shell variable
+-- substitution or a dedicated bootstrap script at Milestone 3.

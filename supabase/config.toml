@@ -1,0 +1,61 @@
+# supabase/config.toml — Hand-written Supabase local configuration
+# Supabase CLI is not used in this project; direct psql is used for DB access.
+# This file documents the project configuration for reference.
+# When the Supabase CLI becomes available, run `supabase link --project-ref <ref>`
+# after adding the project ref to SECRETS.md.
+
+[project]
+# Replace with your Supabase project ref (found in: Project Settings > General)
+id = "wa-marketing-bd"
+
+[api]
+enabled = true
+port = 54321
+schemas = ["public", "storage", "graphql_public"]
+extra_search_path = ["public", "extensions"]
+max_rows = 1000
+
+[db]
+port = 54322
+shadow_port = 54320
+major_version = 15
+
+[studio]
+enabled = true
+port = 54323
+api_url = "http://127.0.0.1"
+
+[inbucket]
+enabled = true
+port = 54324
+
+[storage]
+enabled = true
+file_size_limit = "50MiB"
+
+[auth]
+enabled = true
+# Site URL — update with production URL at Milestone 4
+site_url = "http://127.0.0.1:5173"
+additional_redirect_urls = ["https://localhost:5173"]
+jwt_expiry = 3600
+enable_refresh_token_rotation = true
+refresh_token_reuse_interval = 10
+# No email confirmation required — admin manually verifies accounts (REQUIREMENT.md §5)
+enable_signup = true
+
+[auth.email]
+enable_signup = true
+# Confirmations are OFF — no OTP / email verification (REQUIREMENT.md §5)
+double_confirm_changes = false
+enable_confirmations = false
+
+[auth.sms]
+# Phone/SMS auth is disabled — we use synthesized-email + password auth (REQUIREMENT.md §5)
+enable_signup = false
+
+[analytics]
+enabled = false
+
+[functions]
+verify_import_map = true

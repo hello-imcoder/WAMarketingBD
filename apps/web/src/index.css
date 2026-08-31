@@ -1,0 +1,172 @@
+/*
+ * apps/web/src/index.css
+ * Tailwind CSS v4 — CSS-first configuration.
+ * All design tokens are sourced from DESIGN.md verbatim.
+ * Do not edit token values without cross-referencing DESIGN.md.
+ * No tailwind.config.ts — this is the approved CSS-first approach.
+ */
+
+/* ─── Inter Variable — self-hosted, no CDN ──────────────────────────────── */
+@import "@fontsource-variable/inter";
+
+/* ─── Tailwind v4 ───────────────────────────────────────────────────────── */
+@import "tailwindcss";
+
+/* ─── Design tokens — DESIGN.md verbatim ───────────────────────────────── */
+@theme {
+  /* ── Colors ─────────────────────────────────────────────────────────── */
+
+  /* Brand & Accent */
+  --color-primary:              #1b1938;  /* Hero canvas, main CTA, featured pricing */
+  --color-primary-deep:         #0e0c1f;  /* Pressed state, hero gradient stop */
+  --color-on-primary:           #ffffff;  /* Text on dark navy / teal surfaces */
+
+  /* Surface */
+  --color-canvas:               #ffffff;  /* Default body background */
+  --color-canvas-soft:          #fafaf8;  /* Alternating feature-row bands */
+  --color-surface-violet-soft:  #c9b4fa;  /* Hero pill-button fill */
+  --color-surface-teal-deep:    #0e3030;  /* Closing CTA band */
+  --color-surface-teal-mid:     #155555;  /* Nested chrome inside teal band */
+
+  /* Borders */
+  --color-hairline:             #e8e4dd;  /* 1px borders on light surfaces */
+  --color-hairline-dark:        #3f3a52;  /* 1px borders on dark surfaces */
+
+  /* Text */
+  --color-ink:                  #292827;  /* Default body text — warm dark grey, never pure black */
+  --color-ink-mute:             #73706d;  /* Secondary text, captions */
+  --color-ink-faint:            #9a9794;  /* Tertiary / disabled text */
+  --color-on-dark-mute:         #bcbac9;  /* Secondary text on dark surfaces */
+  --color-on-dark-faint:        #5a5772;  /* Tertiary text on dark surfaces */
+
+  /* ── Typography ──────────────────────────────────────────────────────── */
+  /*
+   * Font: Inter Variable (sub-default weights 460 / 540 / 600 — brand signature).
+   * Use font-variation-settings: "wght" 540 etc., NOT font-weight integer shortcuts.
+   * Tight display leading (0.96) and negative tracking are brand-defining — preserve them.
+   */
+
+  --font-family-sans: "Inter Variable", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+
+  /* display-xxl: 64px / 540 / 0.96 / 0 — Hero headline */
+  --font-size-display-xxl:         64px;
+  --line-height-display-xxl:       0.96;
+  --letter-spacing-display-xxl:    0em;
+  --font-weight-display-xxl:       540;
+
+  /* display-xl: 48px / 460 / 0.96 / -1.32px — Section opener on light surfaces */
+  --font-size-display-xl:          48px;
+  --line-height-display-xl:        0.96;
+  --letter-spacing-display-xl:     -0.0275em; /* -1.32px @ 48px */
+  --font-weight-display-xl:        460;
+
+  /* display-lg: 28px / 540 / 1.14 / -0.63px — Sub-section / feature title */
+  --font-size-display-lg:          28px;
+  --line-height-display-lg:        1.14;
+  --letter-spacing-display-lg:     -0.0225em; /* -0.63px @ 28px */
+  --font-weight-display-lg:        540;
+
+  /* display-md: 22px / 460 / 1.1 / -0.315px — Card title */
+  --font-size-display-md:          22px;
+  --line-height-display-md:        1.1;
+  --letter-spacing-display-md:     -0.0143em; /* -0.315px @ 22px */
+  --font-weight-display-md:        460;
+
+  /* heading-lg: 20px / 460 / 1.2 / -0.4px — Compact card title */
+  --font-size-heading-lg:          20px;
+  --line-height-heading-lg:        1.2;
+  --letter-spacing-heading-lg:     -0.02em; /* -0.4px @ 20px */
+  --font-weight-heading-lg:        460;
+
+  /* body-lg: 18px / 540 / 1.5 / -0.135px — Marketing body lead */
+  --font-size-body-lg:             18px;
+  --line-height-body-lg:           1.5;
+  --letter-spacing-body-lg:        -0.0075em; /* -0.135px @ 18px */
+  --font-weight-body-lg:           540;
+
+  /* body-md: 16px / 460 / 1.5 / 0 — Default UI body */
+  --font-size-body-md:             16px;
+  --line-height-body-md:           1.5;
+  --letter-spacing-body-md:        0em;
+  --font-weight-body-md:           460;
+
+  /* body-strong: 18.72px / 700 / 1.5 / 0 — Emphasized body */
+  --font-size-body-strong:         18.72px;
+  --line-height-body-strong:       1.5;
+  --letter-spacing-body-strong:    0em;
+  --font-weight-body-strong:       700;
+
+  /* button-md: 16px / 700 / 1.0 / 0 — Rounded-rectangle button label */
+  --font-size-button-md:           16px;
+  --line-height-button-md:         1.0;
+  --letter-spacing-button-md:      0em;
+  --font-weight-button-md:         700;
+
+  /* button-cap: 14px / 600 / 1.0 / 0 — Compact button label */
+  --font-size-button-cap:          14px;
+  --line-height-button-cap:        1.0;
+  --letter-spacing-button-cap:     0em;
+  --font-weight-button-cap:        600;
+
+  /* caption: 14px / 460 / 1.4 / 0 — Helper, footnote */
+  --font-size-caption:             14px;
+  --line-height-caption:           1.4;
+  --letter-spacing-caption:        0em;
+  --font-weight-caption:           460;
+
+  /* micro: 12px / 540 / 1.4 / 0 — Pill label, fine print */
+  --font-size-micro:               12px;
+  --line-height-micro:             1.4;
+  --letter-spacing-micro:          0em;
+  --font-weight-micro:             540;
+
+  /* ── Border radius ───────────────────────────────────────────────────── */
+  --radius-xs:   4px;    /* Hairline tags */
+  --radius-sm:   6px;    /* Form inputs */
+  --radius-md:   8px;    /* Buttons — brand signature rounded rectangle */
+  --radius-lg:   12px;   /* Pricing cards, feature cards */
+  --radius-xl:   16px;   /* Modal dialogs, large feature cards */
+  --radius-full: 9999px; /* Pill — hero CTA and pill tabs ONLY */
+
+  /* ── Spacing (8px base) ─────────────────────────────────────────────── */
+  --spacing-xxs:  2px;
+  --spacing-xs:   4px;
+  --spacing-sm:   8px;
+  --spacing-md:   12px;
+  --spacing-lg:   16px;
+  --spacing-xl:   24px;
+  --spacing-xxl:  32px;
+  --spacing-huge: 64px;
+
+  /* ── Elevation / shadows ───────────────────────────────────────────── */
+  --shadow-1: 0 1px 3px rgba(0, 0, 0, 0.08);   /* Subtle card lift */
+  --shadow-2: 0 8px 24px rgba(0, 0, 0, 0.12);  /* Floating panels, modals */
+}
+
+/* ─── Base styles ────────────────────────────────────────────────────────── */
+@layer base {
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+
+  html {
+    font-family: var(--font-family-sans);
+    font-size: var(--font-size-body-md);
+    line-height: var(--line-height-body-md);
+    color: var(--color-ink);
+    background-color: var(--color-canvas);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    margin: 0;
+    min-height: 100dvh;
+  }
+
+  #root {
+    min-height: 100dvh;
+  }
+}

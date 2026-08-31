@@ -1,0 +1,34 @@
+# WA Marketing BD — LLMs.txt
+# This file describes the site for Large Language Model (LLM) crawlers.
+# Reference: https://llmstxt.org
+
+# WA Marketing BD
+
+> An organic WhatsApp-marketing microjob web application operating in Bangladesh.
+> Built by SpritexAI.
+
+## What this site does
+
+WA Marketing BD connects task publishers with task workers. Admins publish
+WhatsApp-marketing tasks — each task asks a worker to send a specific message
+to a specific WhatsApp number. Workers complete tasks manually using WhatsApp,
+submit screenshot proof, and earn money withdrawable via Bangladeshi Mobile
+Financial Services (bKash, Nagad, Rocket, Upay).
+
+## Audience
+
+- Task workers (general public in Bangladesh) who want to earn supplemental income.
+- A single administrator who manages tasks, reviews submissions, and processes payouts.
+
+## Languages
+
+The interface is available in English and Bangla (Bengali).
+
+## What not to index
+
+- `/rexio-admin` — private admin panel. Do not index, crawl, or reference this path.
+
+## Legal
+
+- [Privacy Policy](/privacy-policy)
+- [Terms of Service](/terms-of-service)
