@@ -1,1 +1,79 @@
-{}
+{
+  "auth": {
+    "login": {
+      "title": "Welcome back",
+      "subtitle": "Sign in to your WA Marketing BD account",
+      "phoneLabel": "Phone number",
+      "phonePlaceholder": "01XXXXXXXXX",
+      "passwordLabel": "Password",
+      "submitButton": "Sign in",
+      "noAccount": "Don't have an account?",
+      "signupLink": "Create account"
+    },
+    "register": {
+      "title": "Create account",
+      "subtitle": "Start earning with WA Marketing BD",
+      "phoneLabel": "Phone number",
+      "phonePlaceholder": "01XXXXXXXXX",
+      "passwordLabel": "Password",
+      "referralLabel": "Referral code (optional)",
+      "referralPlaceholder": "8-character code",
+      "submitButton": "Create account",
+      "hasAccount": "Already have an account?",
+      "loginLink": "Sign in"
+    },
+    "onboarding": {
+      "title": "One more step",
+      "subtitle": "Tell us a bit about yourself",
+      "nameLabel": "Full name",
+      "namePlaceholder": "Your name",
+      "emailLabel": "Email (optional)",
+      "emailPlaceholder": "your@email.com",
+      "submitButton": "Get started"
+    },
+    "error": {
+      "invalidPhone": "Enter a valid 11-digit Bangladeshi phone number",
+      "passwordTooShort": "Password must be at least 8 characters",
+      "invalidCredentials": "Incorrect phone number or password",
+      "phoneAlreadyExists": "An account with this phone number already exists",
+      "banned": "Your account has been suspended. Please contact support.",
+      "suspended": "Your account is temporarily suspended. Please contact support.",
+      "rateLimited": "Too many attempts. Please try again later.",
+      "generic": "Something went wrong. Please try again."
+    }
+  },
+  "settings": {
+    "profile": {
+      "title": "Profile",
+      "nameLabel": "Full name",
+      "namePlaceholder": "Your name",
+      "emailLabel": "Email",
+      "emailPlaceholder": "your@email.com",
+      "emailHint": "Optional contact email. Not used for login.",
+      "saveButton": "Save changes",
+      "savedMessage": "Profile updated successfully"
+    },
+    "password": {
+      "title": "Change password",
+      "currentLabel": "Current password",
+      "currentPlaceholder": "Enter current password",
+      "newLabel": "New password",
+      "newPlaceholder": "At least 8 characters",
+      "submitButton": "Update password",
+      "successMessage": "Password updated successfully",
+      "error": {
+        "wrongCurrentPassword": "Current password is incorrect"
+      }
+    }
+  },
+  "common": {
+    "loading": "Loading\u2026",
+    "saving": "Saving\u2026",
+    "phone": "Phone",
+    "password": "Password",
+    "name": "Name",
+    "email": "Email",
+    "back": "Back",
+    "cancel": "Cancel"
+  }
+}

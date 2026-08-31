@@ -143,6 +143,149 @@
   --shadow-2: 0 8px 24px rgba(0, 0, 0, 0.12);  /* Floating panels, modals */
 }
 
+/* ─── Convenience aliases used by component inline styles ───────────────── */
+/* These map short names referenced in component CSS to the full @theme tokens. */
+:root {
+  --font-sans:              var(--font-family-sans);
+  --color-primary:          #1b1938;
+  --color-canvas:           #ffffff;
+  --color-ink:              #292827;
+  --color-ink-mute:         #73706d;
+  --color-ink-faint:        #9a9794;
+  --color-hairline:         #e8e4dd;
+  --color-on-primary:       #ffffff;
+  --rounded-xs:             4px;
+  --rounded-sm:             6px;
+  --rounded-md:             8px;
+  --rounded-lg:             12px;
+  --rounded-xl:             16px;
+  --rounded-full:           9999px;
+  --spacing-xxs:            2px;
+  --spacing-xs:             4px;
+  --spacing-sm:             8px;
+  --spacing-md:             12px;
+  --spacing-lg:             16px;
+  --spacing-xl:             24px;
+  --spacing-xxl:            32px;
+  --spacing-huge:           64px;
+  --text-display-lg-size:   28px;
+  --text-display-lg-weight: 540;
+  --text-display-lg-tracking: -0.0225em;
+  --text-display-lg-leading:  1.14;
+  --text-body-md-size:      16px;
+  --text-body-md-weight:    460;
+  --text-caption-size:      14px;
+  --text-caption-weight:    460;
+  --text-button-md-size:    16px;
+  --text-button-md-weight:  700;
+}
+
+/* ─── Auth page utility classes ─────────────────────────────────────────── */
+@layer components {
+  .auth-page {
+    min-height: 100dvh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--spacing-xl);
+    background-color: var(--color-canvas);
+  }
+
+  .auth-card {
+    width: 100%;
+    max-width: 400px;
+  }
+
+  .auth-header {
+    margin-bottom: var(--spacing-xxl);
+  }
+
+  .auth-wordmark {
+    font-family: var(--font-sans);
+    font-size: var(--text-display-lg-size);
+    font-weight: var(--text-display-lg-weight);
+    font-variation-settings: "wght" 540;
+    letter-spacing: var(--text-display-lg-tracking);
+    line-height: var(--text-display-lg-leading);
+    color: var(--color-primary);
+    margin: 0 0 var(--spacing-xxs);
+  }
+
+  .auth-subtitle {
+    font-family: var(--font-sans);
+    font-size: var(--text-body-md-size);
+    color: var(--color-ink-mute);
+    margin: 0;
+  }
+
+  .auth-error {
+    font-family: var(--font-sans);
+    font-size: var(--text-caption-size);
+    color: #c0392b;
+    margin: 0 0 var(--spacing-lg);
+  }
+
+  .auth-submit-btn {
+    width: 100%;
+    padding: 12px 20px;
+    font-family: var(--font-sans);
+    font-size: var(--text-button-md-size);
+    font-weight: var(--text-button-md-weight);
+    font-variation-settings: "wght" 700;
+    color: var(--color-on-primary);
+    background-color: var(--color-primary);
+    border: none;
+    border-radius: var(--rounded-md);
+    cursor: pointer;
+    transition: background-color 0.15s, opacity 0.15s;
+    margin-bottom: var(--spacing-md);
+  }
+
+  .auth-submit-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+
+  .auth-footer-text {
+    margin-top: var(--spacing-xl);
+    font-family: var(--font-sans);
+    font-size: var(--text-caption-size);
+    color: var(--color-ink-mute);
+    text-align: center;
+  }
+
+  .auth-link {
+    color: var(--color-primary);
+    text-decoration: underline;
+  }
+
+  .settings-section {
+    margin-bottom: var(--spacing-xxl);
+    padding-bottom: var(--spacing-xl);
+    border-bottom: 1px solid var(--color-hairline);
+  }
+
+  .settings-section:last-child {
+    border-bottom: none;
+  }
+
+  .settings-section-title {
+    font-family: var(--font-sans);
+    font-size: var(--text-display-lg-size);
+    font-weight: var(--text-display-lg-weight);
+    font-variation-settings: "wght" 540;
+    color: var(--color-ink);
+    margin: 0 0 var(--spacing-xl);
+  }
+
+  .settings-success {
+    font-family: var(--font-sans);
+    font-size: var(--text-caption-size);
+    color: #1a7a3c;
+    margin: 0 0 var(--spacing-lg);
+  }
+}
+
 /* ─── Base styles ────────────────────────────────────────────────────────── */
 @layer base {
   *,

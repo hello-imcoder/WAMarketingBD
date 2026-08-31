@@ -1,10 +1,13 @@
 // apps/web/src/routes.tsx
 // React Router v7 route tree — all routes use lazy() for code splitting (REQUIREMENT.md §11).
 // /rexio-admin is a separate lazy chunk from the public/user bundle.
+// Auth guards (RequireAuth, RequireAdmin) are wired at layout level — Milestone 3.
 // AdminLayout enforces noindex,nofollow meta at layout level (REQUIREMENT.md §9).
 
 import { lazy, Suspense } from "react";
 import { createBrowserRouter } from "react-router";
+import { RequireAuth } from "@/components/auth/RequireAuth";
+import { RequireAdmin } from "@/components/auth/RequireAdmin";
 
 // ─── Layouts ─────────────────────────────────────────────────────────────────
 import RootLayout from "@/layouts/RootLayout";
@@ -62,26 +65,38 @@ export const router = createBrowserRouter([
       { path: "privacy-policy", element: withSuspense(<PrivacyPolicyPage />) },
       { path: "terms-of-service", element: withSuspense(<TermsOfServicePage />) },
 
-      // User panel — protected (auth guard added at Milestone 3)
+      // User panel — RequireAuth gate: redirects to /login or /onboarding as needed.
+      // AppLayout renders the bottom nav + Outlet for child routes.
       {
         path: "app",
-        element: withSuspense(<AppLayout />),
+        element: <RequireAuth />,
         children: [
-          { index: true, element: withSuspense(<AppIndexPage />) },
-          { path: "task", element: withSuspense(<TaskPage />) },
-          { path: "p2p", element: withSuspense(<P2PPage />) },
-          { path: "wallet", element: withSuspense(<WalletPage />) },
-          { path: "history", element: withSuspense(<HistoryPage />) },
-          { path: "settings", element: withSuspense(<SettingsPage />) },
+          {
+            element: withSuspense(<AppLayout />),
+            children: [
+              { index: true, element: withSuspense(<AppIndexPage />) },
+              { path: "task", element: withSuspense(<TaskPage />) },
+              { path: "p2p", element: withSuspense(<P2PPage />) },
+              { path: "wallet", element: withSuspense(<WalletPage />) },
+              { path: "history", element: withSuspense(<HistoryPage />) },
+              { path: "settings", element: withSuspense(<SettingsPage />) },
+            ],
+          },
         ],
       },
 
-      // Admin panel — separate chunk, noindex enforced at AdminLayout level
+      // Admin panel — RequireAdmin gate: checks session + onboarding + su_admin role.
+      // AdminLayout enforces noindex,nofollow at layout level (§9).
       {
         path: "rexio-admin",
-        element: withSuspense(<AdminLayout />),
+        element: <RequireAdmin />,
         children: [
-          { index: true, element: withSuspense(<AdminPage />) },
+          {
+            element: withSuspense(<AdminLayout />),
+            children: [
+              { index: true, element: withSuspense(<AdminPage />) },
+            ],
+          },
         ],
       },
     ],
