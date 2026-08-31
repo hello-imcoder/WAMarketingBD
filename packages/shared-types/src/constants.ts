@@ -2,10 +2,49 @@
 // Shared enumerations and constants used across apps/web and Edge Functions.
 // Edge Functions keep local copies of the specific values they need
 // (Supabase deploy bundles only the function's own directory).
+//
+// IMPORTANT: Postgres native enum types in the DB mirror these values exactly.
+// If you add or rename a value here, you must also add it with ALTER TYPE in a new migration.
 
-// ─── Task ────────────────────────────────────────────────────────────────────
+// ─── Auth / Phone ─────────────────────────────────────────────────────────────
 
-/** Status of a task submission. */
+/**
+ * The email domain used for synthesized Supabase Auth emails.
+ * Phone-number signup converts: 01XXXXXXXXX → 01XXXXXXXXX@phone.wamarketingbd.internal
+ * Login does the same conversion before calling supabase.auth.signInWithPassword().
+ * This constant is the single source of truth for that domain — never hardcode it elsewhere.
+ */
+export const PHONE_EMAIL_DOMAIN = "phone.wamarketingbd.internal" as const;
+
+/** Constructs the synthesized email from a Bangladeshi phone number. */
+export function phoneToEmail(phone: string): string {
+  return `${phone}@${PHONE_EMAIL_DOMAIN}`;
+}
+
+// ─── User Roles ───────────────────────────────────────────────────────────────
+
+/** Supabase Auth user roles — mirrors Postgres enum `user_role`. */
+export const USER_ROLE = {
+  USER: "user",
+  SU_ADMIN: "su_admin",
+} as const;
+
+export type UserRole = (typeof USER_ROLE)[keyof typeof USER_ROLE];
+
+// ─── Task ─────────────────────────────────────────────────────────────────────
+
+/** Task lifecycle status — mirrors Postgres enum `task_status`. */
+export const TASK_STATUS = {
+  ACTIVE: "active",
+  PAUSED: "paused",
+  EXPIRED: "expired",
+} as const;
+
+export type TaskStatus = (typeof TASK_STATUS)[keyof typeof TASK_STATUS];
+
+// ─── Submission ───────────────────────────────────────────────────────────────
+
+/** Status of a task submission — mirrors Postgres enum `submission_status`. */
 export const SUBMISSION_STATUS = {
   PENDING: "pending",
   APPROVED: "approved",
@@ -15,9 +54,12 @@ export const SUBMISSION_STATUS = {
 export type SubmissionStatus =
   (typeof SUBMISSION_STATUS)[keyof typeof SUBMISSION_STATUS];
 
-// ─── Wallet / Withdrawal ─────────────────────────────────────────────────────
+/** Maximum length of a rejection reason string (enforced client + Edge Function). */
+export const REJECTION_REASON_MAX_LEN = 1000 as const;
 
-/** Status of a withdrawal request. */
+// ─── Wallet / Withdrawal ──────────────────────────────────────────────────────
+
+/** Status of a withdrawal request — mirrors Postgres enum `withdrawal_status`. */
 export const WITHDRAWAL_STATUS = {
   PENDING: "pending",
   COMPLETED: "completed",
@@ -27,7 +69,7 @@ export const WITHDRAWAL_STATUS = {
 export type WithdrawalStatus =
   (typeof WITHDRAWAL_STATUS)[keyof typeof WITHDRAWAL_STATUS];
 
-/** Supported MFS (Mobile Financial Service) providers in Bangladesh. */
+/** Supported MFS (Mobile Financial Service) providers — mirrors Postgres enum `mfs_provider`. */
 export const MFS_PROVIDER = {
   BKASH: "bkash",
   NAGAD: "nagad",
@@ -37,31 +79,9 @@ export const MFS_PROVIDER = {
 
 export type MfsProvider = (typeof MFS_PROVIDER)[keyof typeof MFS_PROVIDER];
 
-// ─── P2P Transfer ────────────────────────────────────────────────────────────
+// ─── Support Tickets ──────────────────────────────────────────────────────────
 
-/** Status of a P2P transfer. */
-export const P2P_STATUS = {
-  COMPLETED: "completed",
-  FAILED: "failed",
-} as const;
-
-export type P2pStatus = (typeof P2P_STATUS)[keyof typeof P2P_STATUS];
-
-// ─── History / Ledger ────────────────────────────────────────────────────────
-
-/** Entry kind for the history/activity log. */
-export const HISTORY_KIND = {
-  TASK: "task",
-  REFERRAL: "referral",
-  P2P: "p2p",
-  WITHDRAWAL: "withdrawal",
-} as const;
-
-export type HistoryKind = (typeof HISTORY_KIND)[keyof typeof HISTORY_KIND];
-
-// ─── Support Tickets ─────────────────────────────────────────────────────────
-
-/** Status of a support ticket. */
+/** Status of a support ticket — mirrors Postgres enum `ticket_status`. */
 export const TICKET_STATUS = {
   OPEN: "open",
   REPLIED: "replied",
@@ -70,12 +90,10 @@ export const TICKET_STATUS = {
 
 export type TicketStatus = (typeof TICKET_STATUS)[keyof typeof TICKET_STATUS];
 
-// ─── User Roles ──────────────────────────────────────────────────────────────
-
-/** Supabase Auth user roles. */
-export const USER_ROLE = {
-  USER: "user",
-  SU_ADMIN: "su_admin",
-} as const;
-
-export type UserRole = (typeof USER_ROLE)[keyof typeof USER_ROLE];
+// ─── Removed in Milestone 2 ────────────────────────────────────────────────────
+// P2P_STATUS removed: P2P transfers are atomic (committed or rolled back) —
+//   there is no "pending" P2P state, so no DB enum or TS constant is needed.
+//
+// HISTORY_KIND removed: "history" is a derived query across multiple tables,
+//   not a dedicated DB table. The filter tabs in the History page UI can use
+//   string literals directly without a shared constant.

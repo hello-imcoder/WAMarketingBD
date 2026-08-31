@@ -104,7 +104,34 @@ Update the milestone checkbox (`[ ]` → `[x]`) for any completed milestone.
 
 ---
 
-## 9. Deviation policy
+## 9. Operational notes (Milestone 2+)
+
+### Rate limiting — opportunistic inline cleanup (no pg_cron)
+`pg_cron` is not enabled on this Supabase project. The `rate_limit_counters` table is cleaned
+up **inline** by every Edge Function that reads it — before doing its own counter read/write,
+run this batch delete:
+
+```sql
+DELETE FROM rate_limit_counters
+WHERE expires_at < NOW()
+AND ctid IN (
+  SELECT ctid FROM rate_limit_counters WHERE expires_at < NOW() LIMIT 50
+);
+```
+
+This bounds table growth without a background job at the cost of a small extra query per
+rate-limited call. Maximum 50 rows deleted per invocation. Document this in each affected
+Edge Function's implementation comment (Milestone 11).
+
+Rate-limit key format: `'<action>:<dimension>:<value>'`
+- `'login:ip:<ip_address>'`
+- `'submit:user:<user_uuid>'`
+- `'p2p:user:<user_uuid>'`
+- `'withdraw:user:<user_uuid>'`
+
+---
+
+## 10. Deviation policy
 
 If something in `REQUIREMENT.md` or `DESIGN.md` is ambiguous, conflicting, or needs a decision:
 

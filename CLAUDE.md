@@ -70,6 +70,12 @@
 - `/rexio-admin` layout must include `<meta name="robots" content="noindex,nofollow" />`.
 - Input validated client-side (Zod) AND server-side (Edge Function) — both layers required.
 
+### Rate limiting (Milestone 11 guidance)
+`pg_cron` is not enabled. Rate limiting uses `rate_limit_counters` table (DB-backed, since Edge
+Functions share no in-memory state on free tier). Cleanup is **opportunistic inline**: each
+rate-limiting Edge Function runs `DELETE FROM rate_limit_counters WHERE expires_at < NOW() LIMIT 50`
+before its own read/write. See `AGENT.md §9` and `0011_rate_limit_counters.sql` for the full pattern.
+
 ---
 
 ## Local environment setup
