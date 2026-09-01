@@ -18,6 +18,7 @@ import {
   phoneToEmail,
 } from "@wa-marketing-bd/shared-types";
 import { AuthInputField } from "@/components/auth/AuthInputField";
+import { LogoutButton } from "@/components/auth/LogoutButton";
 import { SupportSection } from "@/components/user/SupportSection";
 
 // ─── Profile section ──────────────────────────────────────────────────────────
@@ -248,6 +249,29 @@ function PasswordSection(): React.ReactElement {
   );
 }
 
+// ─── Sign-out section ─────────────────────────────────────────────────────────
+
+function LogoutSection(): React.ReactElement {
+  const { t } = useTranslation();
+
+  return (
+    <section className="settings-section">
+      <h2 className="settings-section-title">{t("auth.logout.title")}</h2>
+      <p
+        style={{
+          fontFamily: "var(--font-sans)",
+          fontSize: "var(--text-caption-size)",
+          color: "var(--color-ink-mute)",
+          margin: "calc(-1 * var(--spacing-md)) 0 var(--spacing-lg)",
+        }}
+      >
+        {t("auth.logout.hint")}
+      </p>
+      <LogoutButton />
+    </section>
+  );
+}
+
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default function SettingsPage(): React.ReactElement {
@@ -262,6 +286,7 @@ export default function SettingsPage(): React.ReactElement {
       <ProfileSection />
       <PasswordSection />
       <SupportSection />
+      <LogoutSection />
     </main>
   );
 }

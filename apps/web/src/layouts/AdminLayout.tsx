@@ -6,6 +6,7 @@ import { NavLink, Outlet } from "react-router";
 import { useTranslation } from "react-i18next";
 import { applySeo } from "@/lib/seo";
 import { useAuthStore } from "@/stores/authStore";
+import { LogoutButton } from "@/components/auth/LogoutButton";
 
 const NAV_ITEMS: Array<{ to: string; key: string; end: boolean }> = [
   { to: "/rexio-admin", key: "admin.nav.dashboard", end: true },
@@ -38,14 +39,26 @@ export default function AdminLayout(): React.ReactElement {
           padding: "var(--spacing-lg) var(--spacing-xl)",
         }}
       >
-        <p style={{ margin: 0, fontSize: "18px", fontVariationSettings: '"wght" 540' }}>
-          {t("admin.nav.title")}
-        </p>
-        {profile !== null && (
-          <p style={{ margin: "4px 0 0", fontSize: "12px", color: "var(--color-on-dark-mute)" }}>
-            {profile.name} · {profile.phone}
-          </p>
-        )}
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "flex-start",
+            gap: "var(--spacing-lg)",
+          }}
+        >
+          <div>
+            <p style={{ margin: 0, fontSize: "18px", fontVariationSettings: '"wght" 540' }}>
+              {t("admin.nav.title")}
+            </p>
+            {profile !== null && (
+              <p style={{ margin: "4px 0 0", fontSize: "12px", color: "var(--color-on-dark-mute)" }}>
+                {profile.name} · {profile.phone}
+              </p>
+            )}
+          </div>
+          <LogoutButton variant="onDark" />
+        </div>
         <nav style={{ display: "flex", flexWrap: "wrap", gap: "var(--spacing-md)", marginTop: "var(--spacing-lg)" }}>
           {NAV_ITEMS.map((item) => (
             <NavLink

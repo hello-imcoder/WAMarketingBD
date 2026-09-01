@@ -284,6 +284,32 @@
     color: #1a7a3c;
     margin: 0 0 var(--spacing-lg);
   }
+
+  /* Sign out — destructive-adjacent, so outlined rather than a filled primary
+     button. Keeps it visually subordinate to Save actions on the same page. */
+  .logout-btn {
+    width: 100%;
+    max-width: 200px;
+    padding: 12px 20px;
+    font-family: var(--font-sans);
+    font-size: var(--text-button-md-size);
+    font-variation-settings: "wght" 600;
+    color: var(--color-primary);
+    background-color: var(--color-canvas);
+    border: 1px solid var(--color-primary);
+    border-radius: var(--rounded-md);
+    cursor: pointer;
+    transition: background-color 0.15s, opacity 0.15s;
+  }
+
+  .logout-btn:hover:not(:disabled) {
+    background-color: var(--color-canvas-soft);
+  }
+
+  .logout-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
 }
 
 /* ─── Landing page component classes (DESIGN.md three-canvas rhythm) ────── */

@@ -43,6 +43,12 @@
       "suspended": "Your account is temporarily suspended. Please contact support.",
       "rateLimited": "Too many attempts. Please try again later.",
       "generic": "Something went wrong. Please try again."
+    },
+    "logout": {
+      "title": "Sign out",
+      "hint": "You will need your sign-in details to access your account again.",
+      "button": "Sign out",
+      "pending": "Signing out…"
     }
   },
   "settings": {
