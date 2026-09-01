@@ -12,7 +12,9 @@
     "build": "pnpm --filter @wa-marketing-bd/web build",
     "preview": "pnpm --filter @wa-marketing-bd/web preview",
     "typecheck": "pnpm --filter @wa-marketing-bd/shared-types typecheck && pnpm --filter @wa-marketing-bd/web typecheck",
-    "test": "tsx scripts/test-db-joins.ts"
+    "test": "tsx scripts/test-db-joins.ts && tsx scripts/test-submission-fallback.ts",
+    "test:joins": "tsx scripts/test-db-joins.ts",
+    "test:submission": "tsx scripts/test-submission-fallback.ts"
   },
   "devDependencies": {
     "sharp": "^0.35.4"

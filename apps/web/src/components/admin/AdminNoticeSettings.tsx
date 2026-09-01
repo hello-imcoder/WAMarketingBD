@@ -1,12 +1,10 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
-import type { SiteSettings } from "@wa-marketing-bd/shared-types";
 import { NoticeModal } from "@/components/app/NoticeModal";
 
 export function AdminNoticeSettings() {
-  const [settings, setSettings] = useState<SiteSettings | null>(null);
   const [loading, setLoading] = useState(true);
-  
+
   const [text, setText] = useState("");
   const [isActive, setIsActive] = useState(false);
   const [showTest, setShowTest] = useState(false);
@@ -16,7 +14,6 @@ export function AdminNoticeSettings() {
     async function fetch() {
       const { data } = await supabase.from("site_settings").select("*").eq("id", 1).maybeSingle();
       if (data) {
-        setSettings(data as SiteSettings);
         setText(data.admin_notice_text || "");
         setIsActive(data.is_admin_notice_active || false);
       }

@@ -1,7 +1,3 @@
-import { useEffect, useState } from "react";
-import { supabase } from "@/lib/supabase";
-import { useAuthStore } from "@/stores/authStore";
-
 interface NoticeModalProps {
   onDismiss: () => void;
   noticeText: string;

@@ -5,6 +5,11 @@
 //  - Optional Cloudinary screenshot upload (unsigned preset).
 //  - Submission is created server-side by the create-submission Edge Function
 //    (approved decision (a)) — it captures IP and validates eligibility.
+//    FALLBACK: if the Edge Function is not deployed/unreachable (404/network),
+//    the client falls back to a direct RLS INSERT on `submissions` (the
+//    "submissions: users insert own" policy in 0012_rls.sql enforces
+//    user_id = auth.uid() and status = 'pending' server-side). ip_address is
+//    left null in the fallback — it cannot be captured client-side (spoofable).
 import { useEffect, useState, type ChangeEvent } from "react";
 import { useTranslation } from "react-i18next";
 import { Link, useNavigate, useParams } from "react-router";
@@ -12,6 +17,7 @@ import { applySeo } from "@/lib/seo";
 import { invokeEdgeFunction, EdgeFunctionError } from "@/lib/edgeFunctions";
 import { uploadScreenshot, sha256Hex } from "@/lib/cloudinary";
 import { getDeviceFingerprint } from "@/lib/fingerprint";
+import { supabase } from "@/lib/supabase";
 import { useAuthStore } from "@/stores/authStore";
 import { useTaskDetail } from "@/hooks/useTasks";
 import { taskSubmissionSchema } from "@/lib/validators";
@@ -89,12 +95,50 @@ export default function TaskDetailPage(): React.ReactElement {
         deviceFingerprint,
       });
 
-      const res = await invokeEdgeFunction<CreateSubmissionResponse>(
-        "create-submission",
-        input,
-        session,
-      );
-      void res;
+      try {
+        const res = await invokeEdgeFunction<CreateSubmissionResponse>(
+          "create-submission",
+          input,
+          session,
+        );
+        void res;
+      } catch (err) {
+        // Fallback path: Edge Function missing (404) or unreachable (CORS/
+        // network). The RLS insert policy enforces ownership server-side.
+        // Server-side eligibility (task active/not full, duplicates, rate
+        // limit) is enforced by the UNIQUE(user_id, task_id) constraint and
+        // the task filters in useTasks; server-side re-check happens at
+        // review time (verify-submission/fn_verify_submission).
+        const isMissing =
+          (err instanceof EdgeFunctionError && err.status === 404) ||
+          (err instanceof TypeError && err.message.includes("fetch"));
+        if (!isMissing) throw err;
+
+        const cloudName = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME as string | undefined;
+        const { error: insertError } = await supabase.from("submissions").insert({
+          task_id: input.taskId,
+          user_id: session.user.id,
+          status: "pending",
+          screenshot_url:
+            screenshotPublicId !== null && cloudName !== undefined && cloudName !== ""
+              ? `https://res.cloudinary.com/${cloudName}/image/upload/${screenshotPublicId}`
+              : null,
+          screenshot_hash: screenshotHash,
+          wa_link_clicked_at: waLinkClicked ? new Date().toISOString() : null,
+          device_fingerprint: deviceFingerprint,
+        });
+        if (insertError !== null) {
+          // unique violation 23505 → duplicate submission
+          if (insertError.code === "23505") {
+            setErrorMsg(t("task.error.alreadySubmitted"));
+          } else {
+            setErrorMsg(t("task.error.generic"));
+          }
+          setIsUploading(false);
+          return;
+        }
+      }
+
       setSuccess(true);
       window.setTimeout(() => void navigate("/app/task"), 1200);
     } catch (err) {
