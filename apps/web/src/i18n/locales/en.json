@@ -300,5 +300,18 @@
       "rateLimited": "Too many attempts. Please try again later.",
       "generic": "Transfer failed. Please try again."
     }
+  },
+  "referral": {
+    "title": "Refer & earn",
+    "description": "Share your referral link. When your friend completes their first task, you get a bonus.",
+    "copyLink": "Copy invite link",
+    "copied": "Copied!",
+    "bonusAmount": "Bonus",
+    "paid": "Paid",
+    "pendingBonus": "Waiting for first task",
+    "empty": "No referrals yet. Share your link to start earning.",
+    "error": {
+      "loadFailed": "Could not load referrals."
+    }
   }
 }

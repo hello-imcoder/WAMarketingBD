@@ -8,6 +8,7 @@ import { useTranslation } from "react-i18next";
 import { applySeo } from "@/lib/seo";
 import { useWallet } from "@/hooks/useWallet";
 import { WithdrawalForm } from "@/components/user/WithdrawalForm";
+import { ReferralCard } from "@/components/user/ReferralCard";
 
 export default function WalletPage(): React.ReactElement {
   const { t } = useTranslation();
@@ -118,6 +119,8 @@ export default function WalletPage(): React.ReactElement {
           </div>
         </section>
       )}
+
+      <ReferralCard />
     </main>
   );
 }
