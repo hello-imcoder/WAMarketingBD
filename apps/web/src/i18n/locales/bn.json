@@ -275,5 +275,30 @@
       "belowMin": "Minimum withdrawal amount is ৳{{min}}.",
       "overBalance": "Amount exceeds your verified balance."
     }
+  },
+  "p2p": {
+    "meta": {
+      "title": "P2P Transfer",
+      "description": "Send money instantly to any user by phone number."
+    },
+    "title": "P2P Transfer",
+    "subtitle": "Send from your verified balance to any user by phone number. No fees.",
+    "verifiedBalance": "Verified balance",
+    "recipientPhone": "Recipient phone number",
+    "lookupButton": "Find recipient",
+    "sendingTo": "Sending to",
+    "amount": "Amount (BDT)",
+    "confirmButton": "Confirm & send",
+    "success": "Sent ৳{{amount}} to {{name}} successfully.",
+    "sendAnother": "Send another transfer",
+    "error": {
+      "invalidPhone": "Enter a valid 11-digit Bangladeshi phone number.",
+      "recipientNotFound": "No user found with this phone number.",
+      "selfTransfer": "You cannot send money to yourself.",
+      "insufficientBalance": "Insufficient verified balance.",
+      "banned": "This transfer is not allowed (account suspended).",
+      "rateLimited": "Too many attempts. Please try again later.",
+      "generic": "Transfer failed. Please try again."
+    }
   }
 }
