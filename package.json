@@ -1,19 +1,25 @@
 {
   "name": "wa-marketing-bd",
-  "private": true,
   "version": "0.1.0",
-  "description": "Organic WhatsApp-marketing microjob web app — built by SpritexAI",
-  "scripts": {
-    "dev": "pnpm --filter @wa-marketing-bd/web dev",
-    "build": "pnpm --filter @wa-marketing-bd/web build",
-    "typecheck": "pnpm --filter @wa-marketing-bd/shared-types typecheck && pnpm --filter @wa-marketing-bd/web typecheck",
-    "preview": "pnpm --filter @wa-marketing-bd/web preview"
-  },
+  "private": true,
+  "description": "Organic WhatsApp-marketing microjob web app \u2014 built by SpritexAI",
   "engines": {
     "node": ">=22.0.0",
     "pnpm": ">=10.0.0"
   },
+  "scripts": {
+    "dev": "pnpm --filter @wa-marketing-bd/web dev",
+    "build": "pnpm --filter @wa-marketing-bd/web build",
+    "preview": "pnpm --filter @wa-marketing-bd/web preview",
+    "typecheck": "pnpm --filter @wa-marketing-bd/shared-types typecheck && pnpm --filter @wa-marketing-bd/web typecheck",
+    "test": "tsx scripts/test-db-joins.ts"
+  },
   "devDependencies": {
     "sharp": "^0.35.4"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.112.4",
+    "dotenv": "^17.4.2",
+    "tsx": "^4.23.13"
   }
 }
