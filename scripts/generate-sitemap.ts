@@ -4,7 +4,7 @@
 // Run: pnpm dlx tsx scripts/generate-sitemap.ts
 //
 // Domain resolution order: SITE_URL env → VITE_SITE_URL env → DEFAULT (production)
-// Interim production domain: https://wa-marketing-bd.vercel.app (supersedes the
+// Interim production domain: https://wa-marketing-bd-web.vercel.app (supersedes the
 // dpdns.org domain from the prior session — treat as final for this deployment).
 
 import { readFileSync, writeFileSync } from "node:fs";
@@ -12,7 +12,7 @@ import { join } from "node:path";
 
 const WEB = join(import.meta.dirname, "..", "apps", "web");
 
-const DEFAULT_SITE_URL = "https://wa-marketing-bd.vercel.app";
+const DEFAULT_SITE_URL = "https://wa-marketing-bd-web.vercel.app";
 const siteUrl = (
   process.env["SITE_URL"] ??
   process.env["VITE_SITE_URL"] ??

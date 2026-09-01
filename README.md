@@ -6,7 +6,7 @@
 
 > Organic WhatsApp-marketing microjob web app — built by **SpritexAI**.
 
-**Live:** https://wa-marketing-bd.vercel.app
+**Live:** https://wa-marketing-bd-web.vercel.app
 
 ---
 
@@ -110,7 +110,7 @@ pnpm install
 cp .env.example apps/web/.env.local
 #    Fill real values from SECRETS.md (owner-maintained, gitignored):
 #    VITE_SUPABASE_URL, VITE_SUPABASE_ANON_KEY, VITE_CLOUDINARY_*,
-#    VITE_SITE_URL (https://wa-marketing-bd.vercel.app)
+#    VITE_SITE_URL (https://wa-marketing-bd-web.vercel.app)
 
 # 3. Start the dev server (http://localhost:5173)
 pnpm dev
@@ -178,7 +178,7 @@ Full details: [`SECURITY.md`](./SECURITY.md) · Requirements: [`REQUIREMENT.md`]
 ## Screenshots
 
 <!-- Owner: add live screenshots here once the app is deployed at
-     https://wa-marketing-bd.vercel.app (landing, task submit, wallet, admin).
+     https://wa-marketing-bd-web.vercel.app (landing, task submit, wallet, admin).
      As of this writing DNS is not yet pointed — placeholder intentionally left. -->
 
 _Live screenshots to be added after deployment._
