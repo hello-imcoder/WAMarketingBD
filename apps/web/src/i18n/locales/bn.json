@@ -313,5 +313,45 @@
     "error": {
       "loadFailed": "Could not load referrals."
     }
+  },
+  "history": {
+    "meta": {
+      "title": "History",
+      "description": "All of your task, referral, P2P and withdrawal activity."
+    },
+    "title": "History",
+    "tab": {
+      "all": "All",
+      "task": "Task",
+      "referral": "Referral",
+      "p2p": "P2P",
+      "withdrawal": "Withdrawal"
+    },
+    "entry": {
+      "task": "Task submission",
+      "referral": "Referral bonus",
+      "p2p_sent": "P2P transfer sent",
+      "p2p_received": "P2P transfer received",
+      "withdrawal": "Withdrawal to {{provider}} {{account}}"
+    },
+    "status": {
+      "pending": "Pending",
+      "approved": "Approved",
+      "rejected": "Rejected",
+      "paid": "Paid",
+      "sent": "Sent",
+      "received": "Received",
+      "completed": "Completed",
+      "open": "Open",
+      "replied": "Replied",
+      "closed": "Closed",
+      "expired": "Expired",
+      "paused": "Paused",
+      "active": "Active"
+    },
+    "empty": "Nothing here yet.",
+    "error": {
+      "loadFailed": "Could not load history. Please try again."
+    }
   }
 }
