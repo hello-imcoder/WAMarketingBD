@@ -35,6 +35,7 @@ export type Profile = {
   suspended_at: string | null; // timestamptz — null = not suspended
   created_at: string;
   updated_at: string;
+  last_seen_notice_at: string | null;
 };
 
 // ── tasks (0003_tasks.sql) ────────────────────────────────────────────────────
@@ -140,6 +141,9 @@ export type SiteSettings = {
   min_withdrawal_amount: number; // BDT taka, admin-configurable (§7.3)
   referral_bonus_amount: number; // BDT taka, admin-configurable (kickoff Q9)
   updated_at: string;
+  admin_notice_text: string | null;
+  is_admin_notice_active: boolean;
+  admin_notice_updated_at: string | null;
 };
 
 // ── rate_limit_counters (0011_rate_limit_counters.sql) ────────────────────────

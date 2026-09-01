@@ -2,6 +2,7 @@
 // Route: "/rexio-admin" — admin dashboard (§9: noindex,nofollow via AdminLayout).
 import { Link } from "react-router";
 import { useTranslation } from "react-i18next";
+import { AdminNoticeSettings } from "@/components/admin/AdminNoticeSettings";
 
 const CARDS: Array<{ to: string; titleKey: string; descKey: string }> = [
   { to: "tasks", titleKey: "admin.nav.tasks", descKey: "admin.dashboard.tasksDesc" },
@@ -14,30 +15,33 @@ const CARDS: Array<{ to: string; titleKey: string; descKey: string }> = [
 export default function AdminPage(): React.ReactElement {
   const { t } = useTranslation();
   return (
-    <div style={{ display: "grid", gap: "var(--spacing-lg)", gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))" }}>
-      {CARDS.map((card) => (
-        <Link
-          key={card.to}
-          to={card.to}
-          style={{
-            border: "1px solid var(--color-hairline)",
-            borderRadius: "var(--rounded-lg)",
-            padding: "var(--spacing-xl)",
-            textDecoration: "none",
-            color: "var(--color-ink)",
-            background: "var(--color-canvas)",
-            display: "block",
-          }}
-        >
-          <p style={{ margin: 0, fontSize: "18px", fontVariationSettings: '"wght" 540' }}>
-            {t(card.titleKey)}
-          </p>
-          <p style={{ margin: "6px 0 0", fontSize: "14px", color: "var(--color-ink-mute)" }}>
-            {t(card.descKey)}
-          </p>
-        </Link>
-      ))}
-    </div>
+    <>
+      <div style={{ display: "grid", gap: "var(--spacing-lg)", gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))" }}>
+        {CARDS.map((card) => (
+          <Link
+            key={card.to}
+            to={card.to}
+            style={{
+              border: "1px solid var(--color-hairline)",
+              borderRadius: "var(--rounded-lg)",
+              padding: "var(--spacing-xl)",
+              textDecoration: "none",
+              color: "var(--color-ink)",
+              background: "var(--color-canvas)",
+              display: "block",
+            }}
+          >
+            <p style={{ margin: 0, fontSize: "18px", fontVariationSettings: '"wght" 540' }}>
+              {t(card.titleKey)}
+            </p>
+            <p style={{ margin: "6px 0 0", fontSize: "14px", color: "var(--color-ink-mute)" }}>
+              {t(card.descKey)}
+            </p>
+          </Link>
+        ))}
+      </div>
+      <AdminNoticeSettings />
+    </>
   );
 }
 

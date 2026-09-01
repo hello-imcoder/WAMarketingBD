@@ -2,6 +2,7 @@
 // User panel layout — bottom mobile navbar (REQUIREMENT.md §6.1)
 // Order: Task → P2P → Wallet → History → Settings
 import { NavLink, Outlet } from "react-router";
+import { GlobalNoticeManager } from "@/components/app/GlobalNoticeManager";
 import { useTranslation } from "react-i18next";
 
 const NAV_ITEMS = [
@@ -17,6 +18,7 @@ export default function AppLayout(): React.ReactElement {
 
   return (
     <div style={{ display: "flex", flexDirection: "column", minHeight: "100dvh" }}>
+      <GlobalNoticeManager />
       <main style={{ flex: 1 }}>
         <Outlet />
       </main>
