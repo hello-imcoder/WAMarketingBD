@@ -240,5 +240,40 @@
       "banned": "Your account is suspended.",
       "generic": "Something went wrong. Please try again."
     }
+  },
+  "wallet": {
+    "meta": {
+      "title": "Wallet",
+      "description": "Your balances and withdrawal requests."
+    },
+    "title": "Wallet",
+    "balanceTotal": "Total balance",
+    "balanceVerified": "Verified balance",
+    "withdrawTitle": "Request withdrawal",
+    "minNote": "Minimum withdrawal: ৳{{min}}. Requests are reviewed before payment.",
+    "historyTitle": "Recent withdrawal requests",
+    "provider": {
+      "bkash": "bKash",
+      "nagad": "Nagad",
+      "rocket": "Rocket",
+      "upay": "Upay"
+    },
+    "status": {
+      "pending": "Pending",
+      "completed": "Completed",
+      "rejected": "Rejected"
+    },
+    "form": {
+      "provider": "Provider",
+      "amount": "Amount (BDT)",
+      "account": "Account number",
+      "submit": "Request withdrawal",
+      "success": "Withdrawal request submitted! It is now pending review."
+    },
+    "error": {
+      "loadFailed": "Could not load your wallet. Please try again.",
+      "belowMin": "Minimum withdrawal amount is ৳{{min}}.",
+      "overBalance": "Amount exceeds your verified balance."
+    }
   }
 }
