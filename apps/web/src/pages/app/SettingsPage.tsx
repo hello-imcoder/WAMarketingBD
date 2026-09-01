@@ -18,6 +18,7 @@ import {
   phoneToEmail,
 } from "@wa-marketing-bd/shared-types";
 import { AuthInputField } from "@/components/auth/AuthInputField";
+import { SupportSection } from "@/components/user/SupportSection";
 
 // ─── Profile section ──────────────────────────────────────────────────────────
 
@@ -260,7 +261,7 @@ export default function SettingsPage(): React.ReactElement {
     >
       <ProfileSection />
       <PasswordSection />
-      {/* Support section — Milestone 10 */}
+      <SupportSection />
     </main>
   );
 }

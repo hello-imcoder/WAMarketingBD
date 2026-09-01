@@ -353,5 +353,28 @@
     "error": {
       "loadFailed": "Could not load history. Please try again."
     }
+  },
+  "support": {
+    "title": "Support",
+    "subject": "Subject",
+    "message": "Message",
+    "submit": "Open ticket",
+    "created": "Ticket submitted! We will reply soon.",
+    "yourTickets": "Your tickets",
+    "empty": "No tickets yet.",
+    "replyLabel": "Your reply",
+    "replyButton": "Send reply",
+    "adminReply": "Support",
+    "you": "You",
+    "status": {
+      "open": "Open",
+      "replied": "Replied",
+      "closed": "Closed"
+    },
+    "error": {
+      "submit_failed": "Could not submit the ticket. Please try again.",
+      "reply_failed": "Could not send the reply. Please try again.",
+      "load_failed": "Could not load your tickets."
+    }
   }
 }
