@@ -376,5 +376,121 @@
       "reply_failed": "Could not send the reply. Please try again.",
       "load_failed": "Could not load your tickets."
     }
+  },
+  "admin": {
+    "nav": {
+      "title": "Admin Panel",
+      "dashboard": "Dashboard",
+      "tasks": "Tasks",
+      "submissions": "Submissions",
+      "withdrawals": "Withdrawals",
+      "users": "Users",
+      "support": "Support"
+    },
+    "dashboard": {
+      "tasksDesc": "Create, edit and pause WhatsApp tasks",
+      "submissionsDesc": "Review pending task submissions",
+      "withdrawalsDesc": "Process withdrawal requests",
+      "usersDesc": "Verify, suspend or ban users",
+      "supportDesc": "Respond to support tickets"
+    },
+    "error": {
+      "load_failed": "Could not load data.",
+      "generic": "Action failed. Please try again.",
+      "validation_failed": "Please check the form fields.",
+      "create_failed": "Could not create the task.",
+      "update_failed": "Could not save changes.",
+      "auth_failed": "Your session has expired. Please sign in again.",
+      "settings_failed": "Could not save the settings."
+    },
+    "tasks": {
+      "createTitle": "Create task",
+      "editTitle": "Edit task",
+      "listTitle": "All tasks",
+      "whatsappNumber": "WhatsApp number (digits only)",
+      "message": "Message to send",
+      "payout": "Payout (BDT)",
+      "maxCompletions": "Max completions",
+      "expiresAt": "Expires at",
+      "createButton": "Create task",
+      "saveButton": "Save",
+      "pause": "Pause",
+      "resume": "Resume",
+      "edit": "Edit",
+      "empty": "No tasks yet."
+    },
+    "submissions": {
+      "pendingTitle": "Pending submissions",
+      "reviewedTitle": "Reviewed submissions",
+      "approve": "Approve",
+      "reject": "Reject",
+      "rejectTitle": "Reject submission",
+      "rejectConfirm": "Reject",
+      "reasonPlaceholder": "Rejection reason (visible to the user)",
+      "rejectionReason": "Reason",
+      "viewScreenshot": "View screenshot",
+      "waClicked": "WA link clicked",
+      "ip": "IP",
+      "fingerprint": "Device fingerprint",
+      "empty": "No pending submissions.",
+      "error": {
+        "reasonRequired": "A rejection reason is required.",
+        "taskFull": "Task is already full — the submission stays pending.",
+        "alreadyReviewed": "This submission was already reviewed."
+      }
+    },
+    "withdrawals": {
+      "pendingTitle": "Pending withdrawal requests",
+      "processedTitle": "Processed withdrawals",
+      "complete": "Mark completed",
+      "reject": "Reject",
+      "completeTitle": "Complete withdrawal",
+      "rejectTitle": "Reject withdrawal",
+      "completeConfirm": "Confirm completed",
+      "rejectConfirm": "Confirm rejection",
+      "notePlaceholder": "Admin note (optional)",
+      "manualNote": "Send the money manually via the MFS app first — confirming here only records it in the system.",
+      "settingsTitle": "Withdrawal settings",
+      "minAmount": "Minimum withdrawal amount (BDT)",
+      "editMin": "Edit",
+      "empty": "No pending withdrawals.",
+      "error": {
+        "belowMin": "Amount is below the current minimum withdrawal amount.",
+        "insufficientBalance": "User's verified balance is insufficient at approval time.",
+        "alreadyProcessed": "This withdrawal was already processed."
+      }
+    },
+    "users": {
+      "title": "Users",
+      "searchPlaceholder": "Search by phone or name",
+      "searchButton": "Search",
+      "verified": "Verified",
+      "banned": "Banned",
+      "suspended": "Suspended",
+      "admin": "Admin",
+      "verify": "Verify",
+      "unverify": "Unverify",
+      "suspend": "Suspend",
+      "unsuspend": "Unsuspend",
+      "ban": "Ban",
+      "unban": "Unban",
+      "wallet": "Wallet",
+      "submissions": "Submissions",
+      "withdrawals": "Withdrawals",
+      "referralCode": "Referral code",
+      "joined": "Joined",
+      "none": "Nothing here yet.",
+      "empty": "No users found."
+    },
+    "support": {
+      "title": "Support tickets",
+      "viewThread": "View thread",
+      "hideThread": "Hide thread",
+      "replyPlaceholder": "Write a reply",
+      "sendReply": "Send reply",
+      "closeTicket": "Close ticket",
+      "reopenTicket": "Reopen",
+      "empty": "No tickets yet."
+    }
   }
 }

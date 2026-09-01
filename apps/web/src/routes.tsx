@@ -33,6 +33,12 @@ const SettingsPage = lazy(() => import("@/pages/app/SettingsPage"));
 
 // ─── Admin panel — separate chunk (never bundled with user code) ───────────────
 const AdminPage = lazy(() => import("@/pages/rexio-admin/AdminPage"));
+const AdminTaskManagerPage = lazy(() => import("@/pages/rexio-admin/AdminTaskManagerPage"));
+const AdminSubmissionReviewPage = lazy(() => import("@/pages/rexio-admin/AdminSubmissionReviewPage"));
+const AdminWithdrawalPage = lazy(() => import("@/pages/rexio-admin/AdminWithdrawalPage"));
+const AdminUsersPage = lazy(() => import("@/pages/rexio-admin/AdminUsersPage"));
+const AdminUserDetailPage = lazy(() => import("@/pages/rexio-admin/AdminUserDetailPage"));
+const AdminSupportPage = lazy(() => import("@/pages/rexio-admin/AdminSupportPage"));
 
 // ─── Fallback ─────────────────────────────────────────────────────────────────
 function PageLoader(): React.ReactElement {
@@ -97,6 +103,12 @@ export const router = createBrowserRouter([
             element: withSuspense(<AdminLayout />),
             children: [
               { index: true, element: withSuspense(<AdminPage />) },
+              { path: "tasks", element: withSuspense(<AdminTaskManagerPage />) },
+              { path: "submissions", element: withSuspense(<AdminSubmissionReviewPage />) },
+              { path: "withdrawals", element: withSuspense(<AdminWithdrawalPage />) },
+              { path: "users", element: withSuspense(<AdminUsersPage />) },
+              { path: "users/:userId", element: withSuspense(<AdminUserDetailPage />) },
+              { path: "support", element: withSuspense(<AdminSupportPage />) },
             ],
           },
         ],

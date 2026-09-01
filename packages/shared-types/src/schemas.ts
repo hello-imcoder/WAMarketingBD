@@ -144,6 +144,47 @@ export const supportReplySchema = z.object({
 export type SupportTicketInput = z.infer<typeof supportTicketSchema>;
 export type SupportReplyInput = z.infer<typeof supportReplySchema>;
 
+// Admin action on a user account (used by admin-update-user Edge Function, M11).
+// At least one of isVerified/isBanned/suspendedAt must be provided (refinement).
+export const adminUserActionSchema = z
+  .object({
+    userId: z.string().uuid(),
+    isVerified: z.boolean().optional(),
+    isBanned: z.boolean().optional(),
+    /** ISO timestamptz to suspend now, or null to clear suspension. */
+    suspendedAt: z.string().datetime({ offset: true }).nullable().optional(),
+  })
+  .refine(
+    (v) =>
+      v.isVerified !== undefined || v.isBanned !== undefined || v.suspendedAt !== undefined,
+    { message: "At least one of isVerified, isBanned, suspendedAt is required" },
+  );
+
+export type AdminUserActionInput = z.infer<typeof adminUserActionSchema>;
+
+// Admin task create/update (§7.1 — direct RLS-scoped writes via is_su_admin()).
+export const adminTaskCreateSchema = z.object({
+  whatsappNumber: z.string().regex(/^[0-9]{7,15}$/, "WhatsApp number must be 7–15 digits"),
+  message: z.string().min(1, "Message is required").max(2000, "Message too long"),
+  payoutAmount: z.number().int("Payout must be a whole number (BDT taka)").positive("Payout must be positive"),
+  maxCompletions: z.number().int().positive("Max completions must be positive"),
+  /** ISO timestamptz — must be in the future at creation time. */
+  expiresAt: z.string().min(1, "Expiry is required"),
+});
+
+export const adminTaskUpdateSchema = z.object({
+  taskId: z.string().uuid(),
+  whatsappNumber: z.string().regex(/^[0-9]{7,15}$/).optional(),
+  message: z.string().min(1).max(2000).optional(),
+  payoutAmount: z.number().int().positive().optional(),
+  maxCompletions: z.number().int().positive().optional(),
+  expiresAt: z.string().min(1).optional(),
+  status: z.enum(["active", "paused"]).optional(),
+});
+
+export type AdminTaskCreateInput = z.infer<typeof adminTaskCreateSchema>;
+export type AdminTaskUpdateInput = z.infer<typeof adminTaskUpdateSchema>;
+
 // ─── Inferred types ───────────────────────────────────────────────────────────
 
 export type SignupInput = z.infer<typeof signupSchema>;
