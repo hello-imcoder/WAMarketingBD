@@ -1,31 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://wamarketingbd.dpdns.org/</loc>
+    <loc>https://wa-marketing-bd.vercel.app/</loc>
     <lastmod>2026-09-01</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
-    <loc>https://wamarketingbd.dpdns.org/login</loc>
+    <loc>https://wa-marketing-bd.vercel.app/login</loc>
     <lastmod>2026-09-01</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
-    <loc>https://wamarketingbd.dpdns.org/reg</loc>
+    <loc>https://wa-marketing-bd.vercel.app/reg</loc>
     <lastmod>2026-09-01</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
-    <loc>https://wamarketingbd.dpdns.org/privacy-policy</loc>
+    <loc>https://wa-marketing-bd.vercel.app/privacy-policy</loc>
     <lastmod>2026-09-01</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.3</priority>
   </url>
   <url>
-    <loc>https://wamarketingbd.dpdns.org/terms-of-service</loc>
+    <loc>https://wa-marketing-bd.vercel.app/terms-of-service</loc>
     <lastmod>2026-09-01</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.3</priority>
