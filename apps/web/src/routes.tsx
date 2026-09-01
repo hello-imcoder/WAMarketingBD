@@ -25,6 +25,7 @@ const TermsOfServicePage = lazy(() => import("@/pages/TermsOfServicePage"));
 // ─── User panel pages ─────────────────────────────────────────────────────────
 const AppIndexPage = lazy(() => import("@/pages/app/AppIndexPage"));
 const TaskPage = lazy(() => import("@/pages/app/TaskPage"));
+const TaskDetailPage = lazy(() => import("@/pages/app/TaskDetailPage"));
 const P2PPage = lazy(() => import("@/pages/app/P2PPage"));
 const WalletPage = lazy(() => import("@/pages/app/WalletPage"));
 const HistoryPage = lazy(() => import("@/pages/app/HistoryPage"));
@@ -76,6 +77,7 @@ export const router = createBrowserRouter([
             children: [
               { index: true, element: withSuspense(<AppIndexPage />) },
               { path: "task", element: withSuspense(<TaskPage />) },
+              { path: "task/:taskId", element: withSuspense(<TaskDetailPage />) },
               { path: "p2p", element: withSuspense(<P2PPage />) },
               { path: "wallet", element: withSuspense(<WalletPage />) },
               { path: "history", element: withSuspense(<HistoryPage />) },

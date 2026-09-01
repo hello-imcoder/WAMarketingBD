@@ -188,5 +188,57 @@
       "changesTitle": "Changes to these terms",
       "changesBody": "We may update these terms from time to time. Continued use of the platform after changes are published constitutes acceptance of the updated terms."
     }
+  },
+  "app": {
+    "nav": {
+      "task": "Task",
+      "p2p": "P2P",
+      "wallet": "Wallet",
+      "history": "History",
+      "settings": "Settings"
+    }
+  },
+  "task": {
+    "list": {
+      "metaTitle": "Tasks",
+      "metaDescription": "Browse active WhatsApp tasks and earn rewards.",
+      "title": "Tasks",
+      "empty": "No active tasks right now. Check back soon.",
+      "refresh": "Refresh"
+    },
+    "card": {
+      "deadline": "Deadline"
+    },
+    "status": {
+      "available": "Available",
+      "pending": "Pending review",
+      "approved": "Approved",
+      "rejected": "Rejected"
+    },
+    "detail": {
+      "metaTitle": "Task detail",
+      "metaDescription": "Task instructions and submission.",
+      "whatsappNumber": "WhatsApp number",
+      "message": "Message to send",
+      "openWhatsApp": "Open WhatsApp",
+      "linkClicked": "WhatsApp opened — take your screenshot and submit below.",
+      "submitTitle": "Submit proof",
+      "screenshotOptional": "Screenshot is optional, but it helps approval.",
+      "submitButton": "Submit task",
+      "uploading": "Uploading…",
+      "submitted": "Submitted! It is now pending review.",
+      "rejectionReason": "Reason"
+    },
+    "error": {
+      "loadFailed": "Could not load tasks. Please try again.",
+      "notFound": "Task not found or no longer available.",
+      "uploadFailed": "Upload failed. Please try again.",
+      "rateLimited": "Too many submissions. Please try again later.",
+      "taskExpired": "This task has expired.",
+      "taskFull": "This task has reached its completion limit.",
+      "alreadySubmitted": "You have already submitted this task.",
+      "banned": "Your account is suspended.",
+      "generic": "Something went wrong. Please try again."
+    }
   }
 }

@@ -53,12 +53,23 @@ export const passwordChangeSchema = z.object({
 export const taskSubmissionSchema = z.object({
   taskId: z.string().uuid(),
   /** Cloudinary public_id of the uploaded screenshot, or null if not provided (optional per §6.2). */
-  screenshotPublicId: z.string().nullable(),
+  screenshotPublicId: z.string().min(1).max(255).nullable(),
+  /** SHA-256 hex of the uploaded file — duplicate/reuse detection (§8). null if no screenshot. */
+  screenshotHash: z
+    .string()
+    .regex(/^[0-9a-f]{64}$/, "Screenshot hash must be a 64-char lowercase SHA-256 hex")
+    .nullable(),
   /**
-   * True if the user tapped the wa.me deep-link button before submitting.
-   * Logged as wa_link_clicked_at by the Edge Function (fraud signal §8).
+   * True if the user tapped the wa.me deep-link button on the task page before
+   * submitting (fraud signal §8 — stored as wa_link_clicked_at).
    */
   waLinkClicked: z.boolean(),
+  /**
+   * Client-computed device fingerprint (canvas + UA + screen hash — §8 fraud signal).
+   * Inherently client-computed; the trustworthy ip_address is captured server-side
+   * from x-forwarded-for by the create-submission Edge Function.
+   */
+  deviceFingerprint: z.string().min(8).max(128).nullable(),
 });
 
 // Admin action on a submission (used by verify-submission Edge Function)
