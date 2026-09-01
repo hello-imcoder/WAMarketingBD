@@ -6,7 +6,7 @@
       "phoneLabel": "Phone number",
       "phonePlaceholder": "01XXXXXXXXX",
       "identifierLabel": "Phone number or email",
-      "identifierPlaceholder": "01XXXXXXXXX",
+      "identifierPlaceholder": "01XXXXXXXXX or you@example.com",
       "passwordLabel": "Password",
       "submitButton": "Sign in",
       "noAccount": "Don't have an account?",
