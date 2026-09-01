@@ -121,6 +121,30 @@ export function useAdminSubmissions(): {
       reload();
       return null;
     } catch (err) {
+      const isMissing =
+        (err instanceof EdgeFunctionError && err.status === 404) ||
+        (err instanceof TypeError && err.message.includes("fetch"));
+        
+      if (isMissing) {
+        // Fallback to database RPC since Edge Functions are not deployed
+        const { error: rpcError } = await supabase.rpc("fn_verify_submission", {
+          p_submission_id: submissionId,
+          p_action: action,
+          p_rejection_reason: rejectionReason ?? "",
+        });
+        
+        if (rpcError !== null) {
+          // Extract error code from Postgres EXCEPTION 'SUBMISSION:CODE'
+          const match = rpcError.message.match(/SUBMISSION:([A-Z_]+)/);
+          if (match && match[1]) {
+            return match[1] as ReviewErrorCode;
+          }
+          return "VERIFICATION_FAILED";
+        }
+        
+        reload();
+        return null;
+      }
       return err instanceof EdgeFunctionError ? (err.code as ReviewErrorCode) : "UNKNOWN_ERROR";
     }
   }
