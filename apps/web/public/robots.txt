@@ -1,5 +1,5 @@
 User-agent: *
 Disallow: /rexio-admin
 
-# Sitemap — URL updated at Milestone 4 once production domain is confirmed
-# Sitemap: https://YOUR-DOMAIN.COM/sitemap.xml
+Sitemap: https://wa-marketing-bd-placeholder.example/sitemap.xml
+

@@ -67,13 +67,126 @@
     }
   },
   "common": {
-    "loading": "Loading\u2026",
-    "saving": "Saving\u2026",
+    "loading": "Loading…",
+    "saving": "Saving…",
     "phone": "Phone",
     "password": "Password",
     "name": "Name",
     "email": "Email",
     "back": "Back",
     "cancel": "Cancel"
+  },
+  "landing": {
+    "meta": {
+      "title": "Earn real money from simple WhatsApp tasks",
+      "description": "WA Marketing BD pays you for sending WhatsApp messages. Complete microjobs, submit proof, and withdraw via bKash, Nagad, Rocket or Upay."
+    },
+    "hero": {
+      "headline": "Earn real money with simple WhatsApp tasks",
+      "lead": "Browse paid microjobs, send a message on WhatsApp, submit your proof — and withdraw your earnings straight to your mobile wallet.",
+      "ctaPrimary": "Start earning",
+      "ctaSecondary": "Sign in"
+    },
+    "howItWorks": {
+      "title": "How it works",
+      "step_1_label": "Step 1",
+      "step_2_label": "Step 2",
+      "step_3_label": "Step 3",
+      "step_4_label": "Step 4",
+      "browseTitle": "Pick a task",
+      "browseBody": "Choose from a list of active tasks. Each shows the WhatsApp number, the exact message to send, the payout and the deadline.",
+      "sendTitle": "Send the message",
+      "sendBody": "Tap the WhatsApp button to open the chat with the message pre-filled, or copy the number and message manually.",
+      "submitTitle": "Submit proof",
+      "submitBody": "Take a screenshot and submit it. Screenshots are optional — your submission is reviewed by our team.",
+      "earnTitle": "Get paid",
+      "earnBody": "Once approved, your earnings move to your verified balance. Withdraw anytime via bKash, Nagad, Rocket or Upay."
+    },
+    "features": {
+      "title": "Why WA Marketing BD",
+      "tasksTitle": "Daily microjobs",
+      "tasksBody": "A steady stream of WhatsApp-based tasks with clear instructions and fair payouts.",
+      "payoutsTitle": "Instant MFS withdrawals",
+      "payoutsBody": "Cash out to bKash, Nagad, Rocket or Upay. Requests are reviewed and paid quickly.",
+      "referralTitle": "Referral bonuses",
+      "referralBody": "Invite friends with your personal referral link and earn a bonus when they complete their first task.",
+      "p2pTitle": "P2P transfers",
+      "p2pBody": "Send your verified balance to any other user instantly by phone number — with name confirmation before you send.",
+      "secureTitle": "Secure by design",
+      "secureBody": "Bank-grade session security and manual review keep the platform fair and fraud-free.",
+      "supportTitle": "Real human support",
+      "supportBody": "Open a support ticket in the app and get a reply from our team."
+    },
+    "faq": {
+      "title": "Frequently asked questions",
+      "earnQ": "How much can I earn?",
+      "earnA": "Each task shows its payout before you start. Your earnings depend on how many tasks you complete.",
+      "withdrawQ": "How do I withdraw?",
+      "withdrawA": "From your wallet, request a withdrawal to bKash, Nagad, Rocket or Upay. Once your request is approved, the money is sent to your account.",
+      "screenshotQ": "Do I need a screenshot?",
+      "screenshotA": "A screenshot is optional but recommended — it helps our reviewers approve your task faster.",
+      "multipleQ": "Can I do multiple tasks at once?",
+      "multipleA": "Yes. You can work on as many active tasks as you like at the same time.",
+      "referralQ": "How do referrals work?",
+      "referralA": "Share your referral link. When someone signs up with it and completes their first task, you receive a bonus.",
+      "feesQ": "Are there any fees?",
+      "feesA": "No. Sending money to another user (P2P) is free, with no limits."
+    },
+    "tealBand": {
+      "title": "Ready to start earning?",
+      "cta": "Create your free account"
+    },
+    "footer": {
+      "productTitle": "Product",
+      "productSignup": "Sign up",
+      "productLogin": "Sign in",
+      "howItWorksTitle": "Learn more",
+      "howItWorksLink": "How it works",
+      "faqLink": "FAQ",
+      "legalTitle": "Legal",
+      "privacyLink": "Privacy Policy",
+      "termsLink": "Terms of Service",
+      "supportTitle": "Support",
+      "supportText": "Open a ticket from the app Settings page.",
+      "rights": "All rights reserved."
+    }
+  },
+  "legal": {
+    "privacy": {
+      "metaTitle": "Privacy Policy",
+      "metaDescription": "How WA Marketing BD collects, uses and protects your personal data.",
+      "title": "Privacy Policy",
+      "intro": "WA Marketing BD (operated by SpritexAI) respects your privacy. This policy explains what data we collect and how we use it. This document is a draft provided for review and is not legal advice.",
+      "dataTitle": "Data we collect",
+      "dataBody": "We collect your phone number (used as your login), your name, an optional contact email, your task submissions including optional screenshots, MFS account numbers you provide for withdrawals, and technical fraud-prevention signals such as IP address and device fingerprint.",
+      "useTitle": "How we use your data",
+      "useBody": "Your data is used to operate your account, verify task submissions, process withdrawals, prevent fraud and multi-accounting, and provide support. We do not sell your personal data.",
+      "thirdPartyTitle": "Third-party services",
+      "thirdPartyBody": "We use Supabase (database and authentication), Cloudinary (screenshot storage) and Bangladeshi mobile financial services — bKash, Nagad, Rocket and Upay — to deliver the service. These providers process data under their own privacy policies.",
+      "rightsTitle": "Your rights",
+      "rightsBody": "You may update your name, email and password from the Settings page. To request deletion of your account or data, contact support through the in-app ticket system.",
+      "contactTitle": "Contact",
+      "contactBody": "For privacy questions, open a support ticket in the app or contact the operator, SpritexAI."
+    },
+    "terms": {
+      "metaTitle": "Terms of Service",
+      "metaDescription": "The terms governing your use of the WA Marketing BD platform.",
+      "title": "Terms of Service",
+      "intro": "By using WA Marketing BD you agree to these terms. This document is a draft provided for review and is not legal advice.",
+      "accountsTitle": "Accounts",
+      "accountsBody": "One account per person. You must provide a valid Bangladeshi phone number and accurate information. Accounts found to be duplicates or fraudulent may be suspended or banned without payout.",
+      "tasksTitle": "Tasks and submissions",
+      "tasksBody": "Tasks must be completed as described — sending the exact message to the exact WhatsApp number — before the task deadline. Submissions are reviewed manually; the decision to approve or reject a submission (with a stated reason) is final.",
+      "paymentsTitle": "Payments and withdrawals",
+      "paymentsBody": "Approved earnings become verified balance and may be withdrawn to bKash, Nagad, Rocket or Upay, subject to the minimum withdrawal amount. Withdrawal requests are reviewed before payment. P2P transfers between users are final and cannot be reversed.",
+      "conductTitle": "Acceptable use",
+      "conductBody": "You may not use bots or automation, submit fake or reused screenshots, create multiple accounts, send spam or abusive messages, or otherwise abuse the platform. Violations lead to suspension or banning.",
+      "terminationTitle": "Suspension and termination",
+      "terminationBody": "We may suspend or ban accounts that violate these terms. Unapproved pending earnings on banned accounts are forfeited. Verified balances may be withheld where fraud is established.",
+      "liabilityTitle": "Limitation of liability",
+      "liabilityBody": "The service is provided \"as is\". To the maximum extent permitted by law, SpritexAI is not liable for indirect or consequential losses arising from your use of the service.",
+      "changesTitle": "Changes to these terms",
+      "changesBody": "We may update these terms from time to time. Continued use of the platform after changes are published constitutes acceptance of the updated terms."
+    }
   }
 }

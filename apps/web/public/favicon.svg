@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128">
+  <rect width="128" height="128" rx="28" fill="#1b1938"/>
+  <rect width="128" height="128" rx="28" fill="url(#g)" opacity="0.35"/>
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#3f3a52"/>
+      <stop offset="1" stop-color="#0e0c1f"/>
+    </linearGradient>
+  </defs>
+  <!-- speech bubble -->
+  <path d="M64 26c-19.9 0-36 13.4-36 30 0 9.5 5.4 18 13.8 23.5-.7 4.6-2.9 9.3-6.6 12.9-.9.9-.2 2.4 1 2.3 7-.6 13.2-3 17.9-6.2 3.2.8 6.5 1.2 9.9 1.2 19.9 0 36-13.4 36-30S83.9 26 64 26z" fill="#c9b4fa"/>
+  <!-- message dots -->
+  <circle cx="46" cy="56" r="6" fill="#1b1938"/>
+  <circle cx="64" cy="56" r="6" fill="#1b1938"/>
+  <circle cx="82" cy="56" r="6" fill="#1b1938"/>
+  <!-- teal earnings accent: bottom-left check chip -->
+  <circle cx="96" cy="94" r="18" fill="#0e3030"/>
+  <path d="M88 94l6 6 11-12" stroke="#c9b4fa" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>
