@@ -5,6 +5,8 @@
       "subtitle": "Sign in to your WA Marketing BD account",
       "phoneLabel": "Phone number",
       "phonePlaceholder": "01XXXXXXXXX",
+      "identifierLabel": "Phone number or email",
+      "identifierPlaceholder": "01XXXXXXXXX",
       "passwordLabel": "Password",
       "submitButton": "Sign in",
       "noAccount": "Don't have an account?",
@@ -33,6 +35,7 @@
     },
     "error": {
       "invalidPhone": "Enter a valid 11-digit Bangladeshi phone number",
+      "invalidIdentifier": "Enter a valid 11-digit Bangladeshi phone number or an email address",
       "passwordTooShort": "Password must be at least 8 characters",
       "invalidCredentials": "Incorrect phone number or password",
       "phoneAlreadyExists": "An account with this phone number already exists",
