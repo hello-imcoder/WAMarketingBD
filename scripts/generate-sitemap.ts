@@ -3,28 +3,20 @@
 // Generates apps/web/public/sitemap.xml and updates the Sitemap line in robots.txt.
 // Run: pnpm dlx tsx scripts/generate-sitemap.ts
 //
-// Domain resolution order: SITE_URL env → VITE_SITE_URL env → placeholder
-// (documented limitation — PROGRESS.md Q10: the production domain has not been
-// provided yet; REGENERATE this file and robots.txt once the domain is known).
+// Domain resolution order: SITE_URL env → VITE_SITE_URL env → DEFAULT (production)
+// Production domain confirmed: https://wamarketingbd.dpdns.org (Q10 resolved).
 
 import { readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 
 const WEB = join(import.meta.dirname, "..", "apps", "web");
 
-const PLACEHOLDER = "https://wa-marketing-bd-placeholder.example";
+const DEFAULT_SITE_URL = "https://wamarketingbd.dpdns.org";
 const siteUrl = (
   process.env["SITE_URL"] ??
   process.env["VITE_SITE_URL"] ??
-  PLACEHOLDER
+  DEFAULT_SITE_URL
 ).replace(/\/+$/, "");
-
-if (siteUrl === PLACEHOLDER) {
-  console.warn(
-    "generate-sitemap: WARNING — no SITE_URL/VITE_SITE_URL set. Using placeholder domain. " +
-      "Regenerate after the production domain is provided (PROGRESS.md Q10).",
-  );
-}
 
 interface RouteEntry {
   path: string;
@@ -58,13 +50,16 @@ function main(): void {
 
   writeFileSync(join(WEB, "public", "sitemap.xml"), xml);
 
-  // Update the Sitemap line in robots.txt (currently a placeholder comment).
+  // Rewrite the Sitemap line in robots.txt (idempotent — replaces any existing
+  // "Sitemap:" line, or appends one if missing).
   const robotsPath = join(WEB, "public", "robots.txt");
   let robots = readFileSync(robotsPath, "utf8");
-  robots = robots.replace(
-    /# Sitemap[^\n]*\n(# Sitemap: [^\n]*)?/g,
-    `Sitemap: ${siteUrl}/sitemap.xml\n`,
-  );
+  const sitemapLine = `Sitemap: ${siteUrl}/sitemap.xml`;
+  if (/^Sitemap:.*$/m.test(robots)) {
+    robots = robots.replace(/^Sitemap:.*$/m, sitemapLine);
+  } else {
+    robots = robots.trimEnd() + `\n\n${sitemapLine}\n`;
+  }
   writeFileSync(robotsPath, robots);
 
   console.log(`generate-sitemap: wrote sitemap.xml + robots.txt Sitemap line (base: ${siteUrl})`);
