@@ -1,17 +1,22 @@
+// apps/web/src/components/admin/AdminNoticeSettings.tsx
+// Popup notice editor (site_settings.admin_notice_text / is_admin_notice_active).
+// Shown on the Settings page; save feedback via toast (no alert()).
 import { useEffect, useState } from "react";
+import { BellRing } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { NoticeModal } from "@/components/app/NoticeModal";
+import { Card, CardHeader, CardBody, Field, Textarea, Select, Button, useToast } from "./ui";
 
-export function AdminNoticeSettings() {
+export function AdminNoticeSettings(): React.ReactElement {
+  const { toast } = useToast();
   const [loading, setLoading] = useState(true);
-
   const [text, setText] = useState("");
   const [isActive, setIsActive] = useState(false);
-  const [showTest, setShowTest] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [showTest, setShowTest] = useState(false);
 
   useEffect(() => {
-    async function fetch() {
+    async function fetch(): Promise<void> {
       const { data } = await supabase.from("site_settings").select("*").eq("id", 1).maybeSingle();
       if (data) {
         setText(data.admin_notice_text || "");
@@ -19,128 +24,72 @@ export function AdminNoticeSettings() {
       }
       setLoading(false);
     }
-    fetch();
+    void fetch();
   }, []);
 
-  const handleSave = async () => {
+  const handleSave = async (): Promise<void> => {
     setSaving(true);
-    const updated_at = new Date().toISOString();
-    
-    await supabase.from("site_settings").update({
-      admin_notice_text: text,
-      is_admin_notice_active: isActive,
-      admin_notice_updated_at: updated_at,
-    }).eq("id", 1);
-    
-    alert("Saved successfully!");
+    const { error } = await supabase
+      .from("site_settings")
+      .update({
+        admin_notice_text: text,
+        is_admin_notice_active: isActive,
+        admin_notice_updated_at: new Date().toISOString(),
+      })
+      .eq("id", 1);
     setSaving(false);
+    if (error !== null) {
+      toast("error", "Could not save the settings.");
+      return;
+    }
+    toast("success", "Popup notice saved.");
   };
 
-  if (loading) return <div>Loading settings...</div>;
-
   return (
-    <div
-      style={{
-        border: "1px solid var(--color-hairline)",
-        borderRadius: "var(--rounded-lg)",
-        padding: "var(--spacing-xl)",
-        background: "var(--color-canvas)",
-        marginTop: "var(--spacing-xl)",
-      }}
-    >
-      <h2 style={{ fontSize: "18px", margin: "0 0 var(--spacing-sm)", fontVariationSettings: '"wght" 600' }}>
-        🔔 Popup Notification
-      </h2>
-      <p style={{ color: "var(--color-ink-mute)", fontSize: "14px", margin: "0 0 var(--spacing-lg)" }}>
-        When users log in, this message will display as a popup if active.
-      </p>
-
-      <div style={{ marginBottom: "var(--spacing-md)" }}>
-        <label style={{ display: "block", fontSize: "14px", marginBottom: "var(--spacing-xs)", fontVariationSettings: '"wght" 500', color: "inherit" }}>
-          📝 Popup Message
-        </label>
-        <textarea
-          value={text}
-          onChange={(e) => setText(e.target.value)}
-          placeholder="Write popup message..."
-          rows={5}
-          style={{
-            width: "100%",
-            border: "1px solid var(--color-hairline)",
-            borderRadius: "var(--rounded-sm)",
-            padding: "var(--spacing-sm)",
-            fontSize: "14px",
-            resize: "vertical",
-            background: "transparent",
-            color: "var(--color-ink)",
-          }}
-        />
-      </div>
-
-      <div style={{ marginBottom: "var(--spacing-lg)" }}>
-        <label style={{ display: "block", fontSize: "14px", marginBottom: "var(--spacing-xs)", fontVariationSettings: '"wght" 500', color: "inherit" }}>
-          🔘 Status
-        </label>
-        <select
-          value={isActive ? "active" : "inactive"}
-          onChange={(e) => setIsActive(e.target.value === "active")}
-          style={{
-            width: "100%",
-            border: "1px solid var(--color-hairline)",
-            borderRadius: "var(--rounded-sm)",
-            padding: "var(--spacing-sm)",
-            fontSize: "14px",
-            background: "transparent",
-            color: "var(--color-ink)",
-          }}
-        >
-          <option value="active">✅ Active</option>
-          <option value="inactive">❌ Inactive</option>
-        </select>
-      </div>
-
-      <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
-        <button
-          onClick={handleSave}
-          disabled={saving}
-          style={{
-            background: "#00A389",
-            color: "white",
-            border: "none",
-            borderRadius: "var(--rounded-md)",
-            padding: "12px",
-            fontSize: "15px",
-            fontVariationSettings: '"wght" 600',
-            cursor: saving ? "not-allowed" : "pointer",
-            width: "100%",
-          }}
-        >
-          💾 Save Popup
-        </button>
-        <button
-          onClick={() => setShowTest(true)}
-          style={{
-            background: "#F49405",
-            color: "white",
-            border: "none",
-            borderRadius: "var(--rounded-md)",
-            padding: "12px",
-            fontSize: "15px",
-            fontVariationSettings: '"wght" 600',
-            cursor: "pointer",
-            width: "100%",
-          }}
-        >
-          🔔 Test Popup
-        </button>
-      </div>
-
-      {showTest && (
-        <NoticeModal
-          noticeText={text}
-          onDismiss={() => setShowTest(false)}
-        />
-      )}
-    </div>
+    <Card>
+      <CardHeader
+        title="Popup Notification"
+        description="When users log in, this message displays as a popup if active."
+        icon={<BellRing size={18} />}
+      />
+      <CardBody className="flex flex-col gap-4">
+        {loading ? (
+          <p className="m-0 text-sm text-ink-mute">Loading…</p>
+        ) : (
+          <>
+            <Field label="Popup Message" htmlFor="admin-notice-text">
+              <Textarea
+                id="admin-notice-text"
+                value={text}
+                onChange={(e) => setText(e.target.value)}
+                placeholder="Write popup message…"
+                rows={5}
+              />
+            </Field>
+            <Field label="Status" htmlFor="admin-notice-status">
+              <Select
+                id="admin-notice-status"
+                value={isActive ? "active" : "inactive"}
+                onChange={(e) => setIsActive(e.target.value === "active")}
+              >
+                <option value="active">Active</option>
+                <option value="inactive">Inactive</option>
+              </Select>
+            </Field>
+            <div className="flex gap-2">
+              <Button loading={saving} onClick={() => void handleSave()}>
+                Save Popup
+              </Button>
+              <Button variant="outline" onClick={() => setShowTest(true)}>
+                Test Popup
+              </Button>
+            </div>
+            {showTest && (
+              <NoticeModal noticeText={text} onDismiss={() => setShowTest(false)} />
+            )}
+          </>
+        )}
+      </CardBody>
+    </Card>
   );
 }

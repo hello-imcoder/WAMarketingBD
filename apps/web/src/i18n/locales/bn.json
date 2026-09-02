@@ -84,7 +84,8 @@
     "name": "Name",
     "email": "Email",
     "back": "Back",
-    "cancel": "Cancel"
+    "cancel": "Cancel",
+    "retry": "আবার চেষ্টা করুন"
   },
   "landing": {
     "meta": {
@@ -398,7 +399,8 @@
       "submissions": "Submissions",
       "withdrawals": "Withdrawals",
       "users": "Users",
-      "support": "Support"
+      "support": "Support",
+      "settings": "সেটিংস"
     },
     "dashboard": {
       "tasksDesc": "Create, edit and pause WhatsApp tasks",
@@ -408,7 +410,17 @@
       "supportDesc": "Respond to support tickets",
       "statActiveTasks": "সক্রিয় টাস্ক",
       "statTotalCompleted": "মোট সম্পন্ন",
-      "statPendingReview": "পর্যালোচনা বাকি"
+      "statPendingReview": "পর্যালোচনা বাকি",
+      "title": "ড্যাশবোর্ড",
+      "subtitle": "টাস্ক, সাবমিশন, উইথড্র এবং ব্যবহারকারীদের সারসংক্ষেপ",
+      "newTask": "নতুন টাস্ক",
+      "reviewQueue": "সাবমিশন রিভিউ",
+      "withdrawalsQueue": "উইথড্র",
+      "totalUsers": "মোট ব্যবহারকারী",
+      "pendingSubmissions": "অপেক্ষমাণ সাবমিশন",
+      "pendingWithdrawals": "অপেক্ষমাণ উইথড্র",
+      "openTickets": "খোলা টিকেট",
+      "totalPaidOut": "মোট পরিশোধিত"
     },
     "error": {
       "load_failed": "Could not load data.",
@@ -436,7 +448,13 @@
       "empty": "No tasks yet.",
       "whatsappNumbers": "হোয়াটসঅ্যাপ নম্বর (প্রতি লাইনে একটা বা কমা দিয়ে)",
       "whatsappNumbersPlaceholder": "8801XXXXXXXXX\n8801YYYYYYYYY",
-      "completionCount": "{{count}}/{{max}} সম্পন্ন"
+      "completionCount": "{{count}}/{{max}} সম্পন্ন",
+      "newButton": "নতুন টাস্ক",
+      "listDesc": "WhatsApp টাস্ক তৈরি, বিরত এবং পর্যবেক্ষণ করুন",
+      "details": "বিস্তারিত",
+      "createdToast": "টাস্ক তৈরি হয়েছে।",
+      "updatedToast": "টাস্ক আপডেট হয়েছে।",
+      "whatsappNumberEditHint": "এডিট করার সময় WhatsApp নম্বর একটিমাত্র হতে হবে।"
     },
     "submissions": {
       "pendingTitle": "Pending submissions",
@@ -456,7 +474,13 @@
         "reasonRequired": "A rejection reason is required.",
         "taskFull": "Task is already full — the submission stays pending.",
         "alreadyReviewed": "This submission was already reviewed."
-      }
+      },
+      "pageTitle": "সাবমিশন",
+      "pageDesc": "জমা দেওয়া টাস্ক রিভিউ করে অনুমোদন বা বাতিল করুন।",
+      "tabPending": "অপেক্ষমাণ",
+      "tabReviewed": "রিভিউ করা",
+      "emptyFiltered": "এখানে কিছু নেই।",
+      "fraudSignals": "ফ্রড সংকেত"
     },
     "withdrawals": {
       "pendingTitle": "Pending withdrawal requests",
@@ -477,7 +501,12 @@
         "belowMin": "Amount is below the current minimum withdrawal amount.",
         "insufficientBalance": "User's verified balance is insufficient at approval time.",
         "alreadyProcessed": "This withdrawal was already processed."
-      }
+      },
+      "pageTitle": "উইথড্র",
+      "pageDesc": "MFS উইথড্র অনুরোধ প্রক্রিয়া করুন।",
+      "tabPending": "অপেক্ষমাণ",
+      "pendingSummary": "অপেক্ষমাণ উইথড্রের পরিমাণ",
+      "providerFilter": "প্রোভাইডার"
     },
     "users": {
       "title": "Users",
@@ -499,7 +528,19 @@
       "referralCode": "Referral code",
       "joined": "Joined",
       "none": "Nothing here yet.",
-      "empty": "No users found."
+      "empty": "No users found.",
+      "listDesc": "ব্যবহারকারী খুঁজুন, ফিল্টার করুন এবং দেখুন।",
+      "name": "নাম",
+      "phoneCol": "ফোন",
+      "statusCol": "স্ট্যাটাস",
+      "backToUsers": "ব্যবহারকারীদের ফিরে যান",
+      "updatedToast": "ব্যবহারকারী আপডেট হয়েছে।",
+      "verifyConfirmMsg": "{{name}} কে ভেরিফাই করবেন? ভেরিফাইড ব্যবহারকারী আয় উইথড্র করতে পারবেন।",
+      "unverifyConfirmMsg": "{{name}} এর ভেরিফিকেশন সরাবেন?",
+      "suspendConfirmMsg": "{{name}} কে সাসপেন্ড করবেন? সাসপেন্ড অবস্থায় তিনি টাস্ক জমা দিতে পারবেন না।",
+      "unsuspendConfirmMsg": "{{name}} এর সাসপেনশন তুলে নেবেন?",
+      "banConfirmMsg": "{{name}} কে ব্যান করবেন? এটি অ্যাকাউন্ট স্থায়ীভাবে বন্ধ করবে।",
+      "unbanConfirmMsg": "{{name}} এর ব্যান তুলে নেবেন?"
     },
     "support": {
       "title": "Support tickets",
@@ -518,7 +559,11 @@
       "noticeStatusActive": "সক্রিয় — ইউজারদের দেখা যাবে",
       "noticeStatusInactive": "নিষ্ক্রিয় — লুকানো",
       "noticeSave": "নোটিশ সংরক্ষণ করুন",
-      "noticeSaved": "নোটিশ সংরক্ষিত হয়েছে!"
+      "noticeSaved": "নোটিশ সংরক্ষিত হয়েছে!",
+      "pageDesc": "ব্যবহারকারীদের টিকেটের উত্তর দিন।",
+      "selectTicket": "থ্রেড দেখতে একটি টিকেট নির্বাচন করুন।",
+      "noReplies": "এখনো কোনো উত্তর নেই।",
+      "replySentToast": "উত্তর পাঠানো হয়েছে।"
     },
     "screenshotSetting": {
       "title": "স্ক্রিনশট নিয়ম",
@@ -532,6 +577,56 @@
       "disabledHint": "টাস্ক পেজ থেকে স্ক্রিনশট আপলোড ফিল্ডটি সরিয়ে দেওয়া হবে।",
       "save": "স্ক্রিনশট সেটিং সংরক্ষণ করুন",
       "saved": "স্ক্রিনশট সেটিং সংরক্ষিত হয়েছে!"
+    },
+    "filter": {
+      "all": "সব",
+      "allProviders": "সব প্রোভাইডার"
+    },
+    "chart": {
+      "approved": "অনুমোদিত",
+      "pending": "অপেক্ষমাণ",
+      "rejected": "বাতিল",
+      "submissionsTitle": "সাবমিশন (শেষ ৩০ দিন)",
+      "submissionsDesc": "প্রতিদিনের অপেক্ষমাণ বনাম অনুমোদিত সাবমিশন",
+      "signupsTitle": "নতুন ব্যবহারকারী (শেষ ৩০ দিন)",
+      "signupsDesc": "প্রতিদিনের নতুন রেজিস্ট্রেশন",
+      "providersTitle": "প্রোভাইডার অনুযায়ী অপেক্ষমাণ উইথড্র",
+      "providersDesc": "প্রতিটি MFS প্রোভাইডারের জন্য অনুরোধকৃত পরিমাণ",
+      "noPending": "কোনো অপেক্ষমাণ উইথড্র নেই।",
+      "approvalTitle": "অনুমোদনের হার",
+      "approvalDesc": "অনুমোদিত বনাম বাতিল সাবমিশন (সর্বমোট)",
+      "noReviews": "এখনো কোনো রিভিউ করা সাবমিশন নেই।"
+    },
+    "queue": {
+      "pendingSubmissions": "অপেক্ষমাণ সাবমিশন",
+      "pendingWithdrawals": "অপেক্ষমাণ উইথড্র",
+      "viewAll": "সব দেখুন",
+      "approvedToast": "সাবমিশন অনুমোদিত হয়েছে।",
+      "completedToast": "উইথড্র সম্পন্ন হিসেবে চিহ্নিত হয়েছে।"
+    },
+    "settings": {
+      "title": "সেটিংস",
+      "description": "নোটিশ, স্ক্রিনশট নিয়ম এবং উইথড্র নিয়মাবলি পরিচালনা করুন।",
+      "minWithdrawalTitle": "সর্বনিম্ন উইথড্র পরিমাণ",
+      "minWithdrawalDesc": "এই পরিমাণের নিচে ব্যবহারকারী উইথড্র করতে পারবেন না।",
+      "minWithdrawalSaved": "সর্বনিম্ন উইথড্র পরিমাণ আপডেট হয়েছে।"
+    },
+    "taskDetail": {
+      "backToTasks": "টাস্কে ফিরে যান",
+      "total": "মোট সাবমিশন",
+      "pending": "অপেক্ষমাণ",
+      "approved": "অনুমোদিত",
+      "rejected": "বাতিল",
+      "uniqueUsers": "ইউনিক ব্যবহারকারী",
+      "payoutCommitted": "প্রদেয় পেআউট",
+      "statusBreakdown": "স্ট্যাটাস বিভাজন",
+      "statusBreakdownDesc": "এই টাস্কের সব সাবমিশন স্ট্যাটাস অনুযায়ী",
+      "overTime": "সময় অনুযায়ী সাবমিশন",
+      "overTimeDesc": "টাস্ক তৈরির পর থেকে প্রতিদিনের সাবমিশন",
+      "submissionsTitle": "এই টাস্কের সাবমিশন",
+      "noSubmissions": "এই টাস্কে এখনো কোনো সাবমিশন নেই।",
+      "viewTask": "টাস্ক দেখুন",
+      "rejectedToast": "সাবমিশন বাতিল হয়েছে।"
     }
   }
 }

@@ -1,11 +1,19 @@
 // apps/web/src/hooks/useAdminTasks.ts
 // Admin task management (§7.1) — direct RLS-scoped writes (is_su_admin() policies).
+// Server-side pagination (.range) + status filter + total count.
 import { useCallback, useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import type { Task } from "@wa-marketing-bd/shared-types";
 
-export function useAdminTasks(): {
+export type TaskStatusFilter = "all" | "active" | "paused" | "expired";
+
+export function useAdminTasks(options: {
+  page: number; // 1-based
+  pageSize: number;
+  status: TaskStatusFilter;
+}): {
   tasks: Task[];
+  total: number;
   isLoading: boolean;
   error: string | null;
   reload: () => void;
@@ -18,7 +26,9 @@ export function useAdminTasks(): {
   }) => Promise<string | null>;
   updateTask: (taskId: string, patch: Partial<Task>) => Promise<string | null>;
 } {
+  const { page, pageSize, status } = options;
   const [tasks, setTasks] = useState<Task[]>([]);
+  const [total, setTotal] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [tick, setTick] = useState(0);
@@ -26,19 +36,31 @@ export function useAdminTasks(): {
   const reload = useCallback((): void => setTick((n) => n + 1), []);
 
   useEffect(() => {
+    let mounted = true;
     void (async () => {
       setIsLoading(true);
       setError(null);
-      const { data, error: dbError } = await supabase
+      const from = (page - 1) * pageSize;
+      const to = from + pageSize - 1;
+      let query = supabase
         .from("tasks")
-        .select("*")
+        .select("*", { count: "exact" })
         .order("created_at", { ascending: false })
-        .limit(100);
+        .range(from, to);
+      if (status !== "all") query = query.eq("status", status);
+      const { data, count, error: dbError } = await query;
+      if (!mounted) return;
       if (dbError !== null) setError("load_failed");
-      else setTasks((data ?? []) as Task[]);
+      else {
+        setTasks((data ?? []) as Task[]);
+        setTotal(count ?? 0);
+      }
       setIsLoading(false);
     })();
-  }, [tick]);
+    return () => {
+      mounted = false;
+    };
+  }, [tick, page, pageSize, status]);
 
   async function createTask(input: {
     whatsappNumbers: string;
@@ -86,5 +108,5 @@ export function useAdminTasks(): {
     return null;
   }
 
-  return { tasks, isLoading, error, reload, createTask, updateTask };
+  return { tasks, total, isLoading, error, reload, createTask, updateTask };
 }

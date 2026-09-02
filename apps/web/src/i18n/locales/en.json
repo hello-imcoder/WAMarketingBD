@@ -84,7 +84,8 @@
     "name": "Name",
     "email": "Email",
     "back": "Back",
-    "cancel": "Cancel"
+    "cancel": "Cancel",
+    "retry": "Retry"
   },
   "landing": {
     "meta": {
@@ -398,7 +399,8 @@
       "submissions": "Submissions",
       "withdrawals": "Withdrawals",
       "users": "Users",
-      "support": "Support"
+      "support": "Support",
+      "settings": "Settings"
     },
     "dashboard": {
       "tasksDesc": "Create, edit and pause WhatsApp tasks",
@@ -408,7 +410,17 @@
       "supportDesc": "Respond to support tickets",
       "statActiveTasks": "Active Tasks",
       "statTotalCompleted": "Total Completed",
-      "statPendingReview": "Pending Review"
+      "statPendingReview": "Pending Review",
+      "title": "Dashboard",
+      "subtitle": "Overview of tasks, submissions, withdrawals and users",
+      "newTask": "New Task",
+      "reviewQueue": "Review Submissions",
+      "withdrawalsQueue": "Withdrawals",
+      "totalUsers": "Total Users",
+      "pendingSubmissions": "Pending Submissions",
+      "pendingWithdrawals": "Pending Withdrawals",
+      "openTickets": "Open Tickets",
+      "totalPaidOut": "Total Paid Out"
     },
     "error": {
       "load_failed": "Could not load data.",
@@ -436,7 +448,13 @@
       "empty": "No tasks yet.",
       "whatsappNumbers": "WhatsApp numbers (one per line or comma-separated)",
       "whatsappNumbersPlaceholder": "8801XXXXXXXXX\n8801YYYYYYYYY",
-      "completionCount": "{{count}}/{{max}} completions"
+      "completionCount": "{{count}}/{{max}} completions",
+      "newButton": "New Task",
+      "listDesc": "Create, pause and monitor WhatsApp tasks",
+      "details": "Details",
+      "createdToast": "Task created.",
+      "updatedToast": "Task updated.",
+      "whatsappNumberEditHint": "The WhatsApp number cannot be a list when editing."
     },
     "submissions": {
       "pendingTitle": "Pending submissions",
@@ -456,7 +474,13 @@
         "reasonRequired": "A rejection reason is required.",
         "taskFull": "Task is already full — the submission stays pending.",
         "alreadyReviewed": "This submission was already reviewed."
-      }
+      },
+      "pageTitle": "Submissions",
+      "pageDesc": "Review submitted tasks and approve or reject them.",
+      "tabPending": "Pending",
+      "tabReviewed": "Reviewed",
+      "emptyFiltered": "Nothing here.",
+      "fraudSignals": "Fraud signals"
     },
     "withdrawals": {
       "pendingTitle": "Pending withdrawal requests",
@@ -477,7 +501,12 @@
         "belowMin": "Amount is below the current minimum withdrawal amount.",
         "insufficientBalance": "User's verified balance is insufficient at approval time.",
         "alreadyProcessed": "This withdrawal was already processed."
-      }
+      },
+      "pageTitle": "Withdrawals",
+      "pageDesc": "Process MFS withdrawal requests.",
+      "tabPending": "Pending",
+      "pendingSummary": "Pending withdrawal amount",
+      "providerFilter": "Provider"
     },
     "users": {
       "title": "Users",
@@ -499,7 +528,19 @@
       "referralCode": "Referral code",
       "joined": "Joined",
       "none": "Nothing here yet.",
-      "empty": "No users found."
+      "empty": "No users found.",
+      "listDesc": "Search, filter and inspect users.",
+      "name": "Name",
+      "phoneCol": "Phone",
+      "statusCol": "Status",
+      "backToUsers": "Back to users",
+      "updatedToast": "User updated.",
+      "verifyConfirmMsg": "Verify {{name}}? Verified users can withdraw earnings.",
+      "unverifyConfirmMsg": "Remove verification from {{name}}?",
+      "suspendConfirmMsg": "Suspend {{name}}? They cannot submit tasks while suspended.",
+      "unsuspendConfirmMsg": "Remove suspension from {{name}}?",
+      "banConfirmMsg": "Ban {{name}}? This blocks the account permanently.",
+      "unbanConfirmMsg": "Unban {{name}}?"
     },
     "support": {
       "title": "Support tickets",
@@ -518,7 +559,11 @@
       "noticeStatusActive": "Active — visible to users",
       "noticeStatusInactive": "Inactive — hidden",
       "noticeSave": "Save notice",
-      "noticeSaved": "Notice saved successfully!"
+      "noticeSaved": "Notice saved successfully!",
+      "pageDesc": "Answer user tickets.",
+      "selectTicket": "Select a ticket to view the thread.",
+      "noReplies": "No replies yet.",
+      "replySentToast": "Reply sent."
     },
     "screenshotSetting": {
       "title": "Screenshot Requirement",
@@ -532,6 +577,56 @@
       "disabledHint": "The screenshot upload field is removed from the task page.",
       "save": "Save Screenshot Setting",
       "saved": "Screenshot setting saved!"
+    },
+    "filter": {
+      "all": "All",
+      "allProviders": "All providers"
+    },
+    "chart": {
+      "approved": "Approved",
+      "pending": "Pending",
+      "rejected": "Rejected",
+      "submissionsTitle": "Submissions (last 30 days)",
+      "submissionsDesc": "Pending vs approved submissions per day",
+      "signupsTitle": "New users (last 30 days)",
+      "signupsDesc": "Daily user registrations",
+      "providersTitle": "Pending withdrawals by provider",
+      "providersDesc": "Amount requested per MFS provider",
+      "noPending": "No pending withdrawals.",
+      "approvalTitle": "Approval rate",
+      "approvalDesc": "Approved vs rejected submissions (all time)",
+      "noReviews": "No reviewed submissions yet."
+    },
+    "queue": {
+      "pendingSubmissions": "Pending submissions",
+      "pendingWithdrawals": "Pending withdrawals",
+      "viewAll": "View all",
+      "approvedToast": "Submission approved.",
+      "completedToast": "Withdrawal marked completed."
+    },
+    "settings": {
+      "title": "Settings",
+      "description": "Manage notices, screenshot requirement and withdrawal rules.",
+      "minWithdrawalTitle": "Minimum withdrawal amount",
+      "minWithdrawalDesc": "Users cannot request a withdrawal below this amount.",
+      "minWithdrawalSaved": "Minimum withdrawal amount updated."
+    },
+    "taskDetail": {
+      "backToTasks": "Back to tasks",
+      "total": "Total submissions",
+      "pending": "Pending",
+      "approved": "Approved",
+      "rejected": "Rejected",
+      "uniqueUsers": "Unique users",
+      "payoutCommitted": "Payout committed",
+      "statusBreakdown": "Status breakdown",
+      "statusBreakdownDesc": "All submissions for this task by status",
+      "overTime": "Submissions over time",
+      "overTimeDesc": "Daily submissions since the task was created",
+      "submissionsTitle": "Submissions for this task",
+      "noSubmissions": "No submissions for this task yet.",
+      "viewTask": "View task",
+      "rejectedToast": "Submission rejected."
     }
   }
 }

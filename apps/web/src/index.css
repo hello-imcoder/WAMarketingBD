@@ -141,6 +141,23 @@
   /* ── Elevation / shadows ───────────────────────────────────────────── */
   --shadow-1: 0 1px 3px rgba(0, 0, 0, 0.08);   /* Subtle card lift */
   --shadow-2: 0 8px 24px rgba(0, 0, 0, 0.12);  /* Floating panels, modals */
+
+  /* ── Semantic status colors (admin panel) ───────────────────────────── */
+  --color-success:       #1a7a3c;
+  --color-success-soft:  #e8f5ec;
+  --color-warning:       #9a5b00;
+  --color-warning-soft:  #fdf2e2;
+  --color-danger:        #b3261e;
+  --color-danger-soft:   #fbeae9;
+  --color-info:          #2457d6;
+  --color-info-soft:     #e9effd;
+
+  /* ── Admin sidebar chrome (dark navy, DESIGN.md primary family) ────── */
+  --color-sidebar:              #1b1938;
+  --color-sidebar-deep:         #14122b;
+  --color-sidebar-item-hover:   #262349;
+  --color-sidebar-item-active:  #343063;
+  --color-sidebar-border:       #3f3a52;
 }
 
 /* ─── Convenience aliases used by component inline styles ───────────────── */
@@ -602,6 +619,26 @@
     color: var(--color-ink-mute);
   }
 }
+
+/* ─── Admin panel helpers ────────────────────────────────────────────────── */
+/* Inter Variable sub-default weights — brand rule: wght via variation axis. */
+@layer utilities {
+  .wt-460 { font-variation-settings: "wght" 460; }
+  .wt-540 { font-variation-settings: "wght" 540; }
+  .wt-600 { font-variation-settings: "wght" 600; }
+  .wt-700 { font-variation-settings: "wght" 700; }
+}
+
+@keyframes sheet-in {
+  from { transform: translateX(24px); opacity: 0; }
+  to   { transform: translateX(0);    opacity: 1; }
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
 
 /* ─── Base styles ────────────────────────────────────────────────────────── */
 @layer base {

@@ -1,90 +1,209 @@
 // apps/web/src/pages/rexio-admin/AdminPage.tsx
 // Route: "/rexio-admin" — admin dashboard (§9: noindex,nofollow via AdminLayout).
-import { Link } from "react-router";
+// KPI row + 30-day charts + quick actions + inline action queue.
+// Settings moved to /rexio-admin/settings; nav duplication removed (sidebar only).
 import { useTranslation } from "react-i18next";
-import { AdminNoticeSettings } from "@/components/admin/AdminNoticeSettings";
-import { AdminScreenshotSettings } from "@/components/admin/AdminScreenshotSettings";
-import { useAdminDashboardStats } from "@/hooks/useAdminDashboardStats";
+import {
+  Users,
+  ListChecks,
+  ClipboardCheck,
+  Wallet,
+  LifeBuoy,
+  Banknote,
+  Plus,
+} from "lucide-react";
+import { StatCard, Card, CardHeader, Button, Skeleton, PageHeader } from "@/components/admin/ui";
+import {
+  SubmissionsTrendChart,
+  SignupsChart,
+  ProviderDonut,
+  ApprovalRing,
+} from "@/components/admin/charts/DashboardCharts";
+import { AdminActionQueue } from "@/components/admin/AdminActionQueue";
+import { useAdminDashboardData } from "@/hooks/useAdminDashboardData";
 
-const CARDS: Array<{ to: string; titleKey: string; descKey: string }> = [
-  { to: "tasks", titleKey: "admin.nav.tasks", descKey: "admin.dashboard.tasksDesc" },
-  { to: "submissions", titleKey: "admin.nav.submissions", descKey: "admin.dashboard.submissionsDesc" },
-  { to: "withdrawals", titleKey: "admin.nav.withdrawals", descKey: "admin.dashboard.withdrawalsDesc" },
-  { to: "users", titleKey: "admin.nav.users", descKey: "admin.dashboard.usersDesc" },
-  { to: "support", titleKey: "admin.nav.support", descKey: "admin.dashboard.supportDesc" },
-];
+const PROVIDER_COLORS: Record<string, string> = {
+  bkash: "#e2136e",
+  nagad: "#f6921e",
+  rocket: "#8c3494",
+  upay: "#00a99d",
+};
 
 export default function AdminPage(): React.ReactElement {
   const { t } = useTranslation();
-  const { activeTasks, totalCompleted, pendingReview, isLoading: statsLoading } = useAdminDashboardStats();
+  const { isLoading, totals, series, withdrawalsByProvider, queue, reload } =
+    useAdminDashboardData();
 
-  const statCards = [
-    { emoji: "⚡", labelKey: "admin.dashboard.statActiveTasks", value: activeTasks },
-    { emoji: "✅", labelKey: "admin.dashboard.statTotalCompleted", value: totalCompleted },
-    { emoji: "⏳", labelKey: "admin.dashboard.statPendingReview", value: pendingReview },
+  const kpis = [
+    {
+      icon: <Users size={20} />,
+      label: t("admin.dashboard.totalUsers"),
+      value: totals.users.toLocaleString(),
+      to: "/rexio-admin/users",
+      tone: "neutral" as const,
+    },
+    {
+      icon: <ListChecks size={20} />,
+      label: t("admin.dashboard.statActiveTasks"),
+      value: totals.activeTasks.toLocaleString(),
+      to: "/rexio-admin/tasks",
+      tone: "neutral" as const,
+    },
+    {
+      icon: <ClipboardCheck size={20} />,
+      label: t("admin.dashboard.pendingSubmissions"),
+      value: totals.pendingSubmissions.toLocaleString(),
+      to: "/rexio-admin/submissions",
+      tone: "warning" as const,
+    },
+    {
+      icon: <Wallet size={20} />,
+      label: t("admin.dashboard.pendingWithdrawals"),
+      value: totals.pendingWithdrawals.toLocaleString(),
+      to: "/rexio-admin/withdrawals",
+      tone: "warning" as const,
+    },
+    {
+      icon: <LifeBuoy size={20} />,
+      label: t("admin.dashboard.openTickets"),
+      value: totals.openTickets.toLocaleString(),
+      to: "/rexio-admin/support",
+      tone: "info" as const,
+    },
+    {
+      icon: <Banknote size={20} />,
+      label: t("admin.dashboard.totalPaidOut"),
+      value: `৳${totals.paidOut.toLocaleString()}`,
+      to: "/rexio-admin/withdrawals",
+      tone: "success" as const,
+    },
   ];
 
   return (
     <>
-      {/* ── Navigation cards ─────────────────────────────────────────── */}
-      <div style={{ display: "grid", gap: "var(--spacing-lg)", gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))" }}>
-        {CARDS.map((card) => (
-          <Link
-            key={card.to}
-            to={card.to}
-            style={{
-              border: "1px solid var(--color-hairline)",
-              borderRadius: "var(--rounded-lg)",
-              padding: "var(--spacing-xl)",
-              textDecoration: "none",
-              color: "var(--color-ink)",
-              background: "var(--color-canvas)",
-              display: "block",
-            }}
-          >
-            <p style={{ margin: 0, fontSize: "18px", fontVariationSettings: '"wght" 540' }}>
-              {t(card.titleKey)}
-            </p>
-            <p style={{ margin: "6px 0 0", fontSize: "14px", color: "var(--color-ink-mute)" }}>
-              {t(card.descKey)}
-            </p>
-          </Link>
+      {/* ── Header + quick actions ──────────────────────────────────── */}
+      <PageHeader
+        title={t("admin.dashboard.title")}
+        description={t("admin.dashboard.subtitle")}
+        actions={
+          <>
+            <Button to="/rexio-admin/tasks?new=1" variant="primary" size="sm">
+              <Plus size={15} /> {t("admin.dashboard.newTask")}
+            </Button>
+            <Button to="/rexio-admin/submissions" variant="outline" size="sm">
+              <ClipboardCheck size={15} /> {t("admin.dashboard.reviewQueue")}
+            </Button>
+            <Button to="/rexio-admin/withdrawals" variant="outline" size="sm">
+              <Wallet size={15} /> {t("admin.dashboard.withdrawalsQueue")}
+            </Button>
+          </>
+        }
+      />
+
+      {/* ── KPI row ─────────────────────────────────────────────────── */}
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
+        {kpis.map((k) => (
+          <StatCard
+            key={k.label}
+            icon={k.icon}
+            label={k.label}
+            value={k.value}
+            to={k.to}
+            tone={k.tone}
+            loading={isLoading}
+          />
         ))}
       </div>
 
-      {/* ── Stat cards ───────────────────────────────────────────────── */}
-      <div
-        style={{
-          display: "grid",
-          gap: "var(--spacing-md)",
-          gridTemplateColumns: "repeat(auto-fill, minmax(180px, 1fr))",
-          marginTop: "var(--spacing-xl)",
-        }}
-      >
-        {statCards.map((s) => (
-          <div
-            key={s.labelKey}
-            style={{
-              border: "1px solid var(--color-hairline)",
-              borderRadius: "var(--rounded-lg)",
-              padding: "var(--spacing-xl)",
-              background: "var(--color-canvas)",
-              textAlign: "center",
-            }}
-          >
-            <p style={{ margin: 0, fontSize: "28px", fontVariationSettings: '"wght" 700' }}>
-              {statsLoading ? "—" : String(s.value)}
-            </p>
-            <p style={{ margin: "6px 0 0", fontSize: "13px", color: "var(--color-ink-mute)" }}>
-              {s.emoji} {t(s.labelKey)}
-            </p>
+      {/* ── Charts: 30-day activity ─────────────────────────────────── */}
+      <div className="mt-6 grid gap-5 lg:grid-cols-2">
+        <Card>
+          <CardHeader
+            title={t("admin.chart.submissionsTitle")}
+            description={t("admin.chart.submissionsDesc")}
+          />
+          <div className="p-4 pt-2">
+            {isLoading ? (
+              <Skeleton className="h-56 w-full" />
+            ) : (
+              <SubmissionsTrendChart data={series.submissions} />
+            )}
           </div>
-        ))}
+        </Card>
+        <Card>
+          <CardHeader
+            title={t("admin.chart.signupsTitle")}
+            description={t("admin.chart.signupsDesc")}
+          />
+          <div className="p-4 pt-2">
+            {isLoading ? (
+              <Skeleton className="h-56 w-full" />
+            ) : (
+              <SignupsChart data={series.signups} />
+            )}
+          </div>
+        </Card>
       </div>
 
-      {/* ── Settings panels ──────────────────────────────────────────── */}
-      <AdminNoticeSettings />
-      <AdminScreenshotSettings />
+      {/* ── Charts: money + quality ─────────────────────────────────── */}
+      <div className="mt-6 grid gap-5 lg:grid-cols-2">
+        <Card>
+          <CardHeader
+            title={t("admin.chart.providersTitle")}
+            description={t("admin.chart.providersDesc")}
+          />
+          <div className="p-4 pt-0">
+            {isLoading ? (
+              <Skeleton className="h-52 w-full" />
+            ) : withdrawalsByProvider.length === 0 ? (
+              <p className="py-16 text-center text-sm text-ink-mute">
+                {t("admin.chart.noPending")}
+              </p>
+            ) : (
+              <>
+                <ProviderDonut data={withdrawalsByProvider} />
+                <div className="mt-2 flex flex-wrap justify-center gap-x-4 gap-y-1">
+                  {withdrawalsByProvider.map((p) => (
+                    <span key={p.provider} className="flex items-center gap-1.5 text-xs text-ink-mute">
+                      <span
+                        className="inline-block size-2.5 rounded-full"
+                        style={{ background: PROVIDER_COLORS[p.provider] ?? "var(--color-primary)" }}
+                      />
+                      {t(`wallet.provider.${p.provider}`)} · ৳{p.amount.toLocaleString()}
+                    </span>
+                  ))}
+                </div>
+              </>
+            )}
+          </div>
+        </Card>
+        <Card>
+          <CardHeader
+            title={t("admin.chart.approvalTitle")}
+            description={t("admin.chart.approvalDesc")}
+          />
+          <div className="p-4 pt-0">
+            {isLoading ? (
+              <Skeleton className="h-52 w-full" />
+            ) : totals.approvalRate === null ? (
+              <p className="py-16 text-center text-sm text-ink-mute">
+                {t("admin.chart.noReviews")}
+              </p>
+            ) : (
+              <ApprovalRing rate={totals.approvalRate} />
+            )}
+          </div>
+        </Card>
+      </div>
+
+      {/* ── Action queue ────────────────────────────────────────────── */}
+      <div className="mt-6">
+        <AdminActionQueue
+          submissions={queue.submissions}
+          withdrawals={queue.withdrawals}
+          onActionDone={reload}
+        />
+      </div>
     </>
   );
 }

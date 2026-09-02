@@ -1,40 +1,41 @@
 // apps/web/src/pages/rexio-admin/AdminWithdrawalPage.tsx
-// Route: "/rexio-admin/withdrawals" — pending queue + complete/reject (§7.3).
-// The MFS transfer itself is manual (outside the app) — this page only
-// records the DB state change via the process-withdrawal Edge Function.
-// Includes the min_withdrawal_amount editor (site_settings RLS admin update).
+// Route: "/rexio-admin/withdrawals" — status tabs + provider filter + pending
+// summary + paginated queue. Complete/reject via process-withdrawal Edge
+// Function (§7.3); the MFS transfer itself is manual (outside the app).
+// Min-withdrawal setting lives on the Settings page now.
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
+import { Banknote } from "lucide-react";
 import { useAdminWithdrawals } from "@/hooks/useAdminWithdrawals";
-import type { WithdrawalErrorCode } from "@/hooks/useAdminWithdrawals";
+import type { WithdrawalStatusFilter, JoinedWithdrawal } from "@/hooks/useAdminWithdrawals";
+import {
+  PageHeader,
+  Badge,
+  statusTone,
+  Button,
+  Modal,
+  Textarea,
+  EmptyState,
+  ListSkeleton,
+  Pagination,
+  Select,
+} from "@/components/admin/ui";
 
-const cardStyle: React.CSSProperties = {
-  border: "1px solid var(--color-hairline)",
-  borderRadius: "var(--rounded-md)",
-  padding: "var(--spacing-lg)",
-  background: "var(--color-canvas)",
-  display: "flex",
-  justifyContent: "space-between",
-  gap: "var(--spacing-lg)",
-  flexWrap: "wrap",
-};
-const btnStyle: React.CSSProperties = {
-  padding: "10px 16px",
-  borderRadius: "var(--rounded-md)",
-  border: "none",
-  fontSize: "13px",
-  fontVariationSettings: '"wght" 600',
-  cursor: "pointer",
-};
+const PAGE_SIZE = 20;
+const PROVIDERS = ["all", "bkash", "nagad", "rocket", "upay"] as const;
 
 export default function AdminWithdrawalPage(): React.ReactElement {
   const { t } = useTranslation();
-  const { pending, processed, settings, isLoading, error, review, updateMinWithdrawal } = useAdminWithdrawals();
+  const [status, setStatus] = useState<WithdrawalStatusFilter>("pending");
+  const [provider, setProvider] = useState<string>("all");
+  const [page, setPage] = useState(1);
   const [actionError, setActionError] = useState<string | null>(null);
-  const [noteFor, setNoteFor] = useState<{ id: string; action: "completed" | "rejected" } | null>(null);
+  const [noteFor, setNoteFor] = useState<{ w: JoinedWithdrawal; action: "completed" | "rejected" } | null>(null);
   const [note, setNote] = useState("");
-  const [minInput, setMinInput] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+
+  const { withdrawals, total, pendingAmount, pendingCount, isLoading, error, review } =
+    useAdminWithdrawals({ page, pageSize: PAGE_SIZE, status, provider });
 
   function errorText(code: string): string {
     if (code === "BELOW_MIN") return t("admin.withdrawals.error.belowMin");
@@ -48,150 +49,187 @@ export default function AdminWithdrawalPage(): React.ReactElement {
     if (noteFor === null) return;
     setBusy(true);
     setActionError(null);
-    const code: WithdrawalErrorCode | null = await review(
-      noteFor.id,
+    const code = await review(
+      noteFor.w.id,
       noteFor.action,
       note.trim() === "" ? null : note.trim(),
     );
+    setBusy(false);
     if (code !== null) setActionError(code);
     else {
       setNoteFor(null);
       setNote("");
     }
-    setBusy(false);
   }
 
-  async function saveMin(): Promise<void> {
-    const amount = Number(minInput);
-    if (!Number.isInteger(amount) || amount <= 0) {
-      setActionError("INVALID_INPUT");
-      return;
-    }
-    const err = await updateMinWithdrawal(amount);
-    if (err !== null) setActionError("WITHDRAWAL_FAILED");
-    else setMinInput(null);
-  }
+  const tabs: Array<{ key: WithdrawalStatusFilter; label: string }> = [
+    { key: "pending", label: t("admin.withdrawals.tabPending") },
+    { key: "completed", label: t("history.status.completed") },
+    { key: "rejected", label: t("history.status.rejected") },
+    { key: "all", label: t("admin.filter.all") },
+  ];
 
   return (
-    <div style={{ display: "grid", gap: "var(--spacing-xxl)" }}>
+    <>
+      <PageHeader title={t("admin.withdrawals.pageTitle")} description={t("admin.withdrawals.pageDesc")} />
+
+      {/* ── Pending summary ─────────────────────────────────────────── */}
+      <div className="mb-4 flex flex-wrap items-center gap-4 rounded-xl border border-hairline bg-canvas p-4 shadow-1">
+        <span className="grid size-10 place-items-center rounded-lg bg-warning-soft text-warning">
+          <Banknote size={20} />
+        </span>
+        <div>
+          <p className="m-0 text-xs text-ink-mute">{t("admin.withdrawals.pendingSummary")}</p>
+          <p className="wt-540 m-0 text-xl text-ink">
+            ৳{pendingAmount.toLocaleString()}{" "}
+            <span className="text-sm wt-460 text-ink-mute">· {pendingCount}</span>
+          </p>
+        </div>
+      </div>
+
+      <div className="mb-4 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+        <div className="flex flex-wrap gap-1.5">
+          {tabs.map((tab) => (
+            <button
+              key={tab.key}
+              type="button"
+              onClick={() => {
+                setStatus(tab.key);
+                setPage(1);
+              }}
+              className={`cursor-pointer rounded-full px-3 py-1.5 text-[13px] wt-540 transition-colors ${
+                status === tab.key
+                  ? "bg-primary text-on-primary"
+                  : "border border-hairline bg-canvas text-ink-mute hover:bg-canvas-soft"
+              }`}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
+        <div className="md:w-44">
+          <Select
+            value={provider}
+            onChange={(e) => {
+              setProvider(e.target.value);
+              setPage(1);
+            }}
+            aria-label={t("admin.withdrawals.providerFilter")}
+          >
+            {PROVIDERS.map((p) => (
+              <option key={p} value={p}>
+                {p === "all" ? t("admin.filter.allProviders") : t(`wallet.provider.${p}`)}
+              </option>
+            ))}
+          </Select>
+        </div>
+      </div>
+
       {actionError !== null && (
-        <p role="alert" style={{ color: "#b3261e", fontSize: "14px", margin: 0 }}>{errorText(actionError)}</p>
+        <p role="alert" className="mb-4 text-sm text-danger">
+          {errorText(actionError)}
+        </p>
+      )}
+      {error !== null && (
+        <p role="alert" className="mb-4 text-sm text-danger">
+          {t("admin.error.load_failed")}
+        </p>
       )}
 
-      <section>
-        <h1 style={{ fontSize: "22px", fontVariationSettings: '"wght" 540', margin: "0 0 12px" }}>
-          {t("admin.withdrawals.pendingTitle")}
-        </h1>
-        {isLoading && <p role="status">{t("common.loading")}</p>}
-        {error !== null && <p role="alert">{t("admin.error.load_failed")}</p>}
-        <div style={{ display: "grid", gap: "var(--spacing-md)" }}>
-          {pending.map((w) => (
-            <div key={w.id} style={cardStyle}>
-              <div>
-                <p style={{ margin: 0, fontSize: "14px", fontVariationSettings: '"wght" 600' }}>
-                  {w.profiles?.name ?? "—"} · {w.profiles?.phone ?? "—"}
-                </p>
-                <p style={{ margin: "4px 0 0", fontSize: "14px" }}>
-                  ৳{w.amount} · {t(`wallet.provider.${w.provider}`)} · {w.account_number}
-                </p>
-                <p style={{ margin: "4px 0 0", fontSize: "12px", color: "var(--color-ink-faint)" }}>
+      {isLoading ? (
+        <ListSkeleton rows={5} />
+      ) : withdrawals.length === 0 ? (
+        <EmptyState title={status === "pending" ? t("admin.withdrawals.empty") : t("admin.submissions.emptyFiltered")} />
+      ) : (
+        <div className="divide-y divide-hairline overflow-hidden rounded-xl border border-hairline bg-canvas shadow-1">
+          {withdrawals.map((w) => (
+            <div key={w.id} className="flex flex-col gap-3 px-5 py-4 md:flex-row md:items-center md:justify-between">
+              <div className="min-w-0">
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="wt-540 text-sm text-ink">৳{w.amount}</span>
+                  <span className="text-sm text-ink-mute">
+                    {w.profiles?.name ?? "—"} · {w.profiles?.phone ?? "—"}
+                  </span>
+                  <Badge tone={statusTone(w.status)}>{t(`history.status.${w.status}`)}</Badge>
+                </div>
+                <p className="mt-1 flex flex-wrap items-center gap-2 text-xs text-ink-mute">
+                  <Badge tone="info">{t(`wallet.provider.${w.provider}`)}</Badge>
+                  {w.account_number}
+                  {" · "}
                   {new Date(w.requested_at).toLocaleString()}
                 </p>
+                {w.admin_note !== null && (
+                  <p className="mt-1 text-xs text-ink-faint">{w.admin_note}</p>
+                )}
               </div>
-              <div style={{ display: "flex", gap: "var(--spacing-sm)" }}>
-                <button type="button" disabled={busy} onClick={() => { setNoteFor({ id: w.id, action: "completed" }); setActionError(null); }}
-                  style={{ ...btnStyle, background: "var(--color-surface-teal-deep)", color: "#fff" }}>
-                  {t("admin.withdrawals.complete")}
-                </button>
-                <button type="button" disabled={busy} onClick={() => { setNoteFor({ id: w.id, action: "rejected" }); setActionError(null); }}
-                  style={{ ...btnStyle, background: "#b3261e", color: "#fff" }}>
-                  {t("admin.withdrawals.reject")}
-                </button>
-              </div>
+              {w.status === "pending" && (
+                <div className="flex shrink-0 flex-wrap gap-1.5">
+                  <Button
+                    size="sm"
+                    variant="success"
+                    onClick={() => {
+                      setNoteFor({ w, action: "completed" });
+                      setActionError(null);
+                    }}
+                  >
+                    {t("admin.withdrawals.complete")}
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="danger"
+                    onClick={() => {
+                      setNoteFor({ w, action: "rejected" });
+                      setActionError(null);
+                    }}
+                  >
+                    {t("admin.withdrawals.reject")}
+                  </Button>
+                </div>
+              )}
             </div>
           ))}
-          {!isLoading && pending.length === 0 && (
-            <p style={{ color: "var(--color-ink-mute)" }}>{t("admin.withdrawals.empty")}</p>
-          )}
         </div>
-      </section>
-
-      <section>
-        <h2 style={{ fontSize: "18px", fontVariationSettings: '"wght" 540', margin: "0 0 12px" }}>
-          {t("admin.withdrawals.settingsTitle")}
-        </h2>
-        {settings !== null && (
-          <div style={cardStyle}>
-            <p style={{ margin: 0, fontSize: "14px" }}>{t("admin.withdrawals.minAmount")}</p>
-            {minInput === null ? (
-              <div style={{ display: "flex", gap: "var(--spacing-md)", alignItems: "center" }}>
-                <span style={{ fontSize: "16px", fontVariationSettings: '"wght" 600' }}>৳{settings.min_withdrawal_amount}</span>
-                <button type="button" onClick={() => { setMinInput(String(settings.min_withdrawal_amount)); setActionError(null); }} style={{ ...btnStyle, border: "1px solid var(--color-hairline)", background: "transparent" }}>
-                  {t("admin.withdrawals.editMin")}
-                </button>
-              </div>
-            ) : (
-              <div style={{ display: "flex", gap: "var(--spacing-sm)" }}>
-                <input value={minInput} inputMode="numeric" onChange={(e) => setMinInput(e.target.value)}
-                  style={{ width: "100px", padding: "8px 10px", border: "1px solid var(--color-hairline)", borderRadius: "var(--rounded-sm)", fontSize: "14px" }} />
-                <button type="button" onClick={() => void saveMin()} style={{ ...btnStyle, background: "var(--color-primary)", color: "var(--color-on-primary)" }}>
-                  {t("admin.tasks.saveButton")}
-                </button>
-              </div>
-            )}
-          </div>
-        )}
-      </section>
-      {processed.length > 0 && (
-        <section>
-          <h2 style={{ fontSize: "18px", fontVariationSettings: '"wght" 540', margin: "0 0 12px" }}>
-            {t("admin.withdrawals.processedTitle")}
-          </h2>
-          <div style={{ display: "grid", gap: "var(--spacing-md)" }}>
-            {processed.map((w) => (
-              <div key={w.id} style={cardStyle}>
-                <div>
-                  <p style={{ margin: 0, fontSize: "14px", fontVariationSettings: '"wght" 600' }}>
-                    {w.profiles?.name ?? "—"} · ৳{w.amount} · {t(`wallet.provider.${w.provider}`)}
-                  </p>
-                  {w.admin_note !== null && (
-                    <p style={{ margin: "4px 0 0", fontSize: "13px", color: "var(--color-ink-mute)" }}>{w.admin_note}</p>
-                  )}
-                </div>
-                <span style={{ fontSize: "13px", color: w.status === "completed" ? "var(--color-surface-teal-deep)" : "#b3261e" }}>
-                  {t(`history.status.${w.status}`)}
-                </span>
-              </div>
-            ))}
-          </div>
-        </section>
       )}
+
+      <div className="mt-4">
+        <Pagination page={page} pageSize={PAGE_SIZE} total={total} onPage={setPage} />
+      </div>
 
       {noteFor !== null && (
-        <div role="dialog" aria-modal="true" style={{ position: "fixed", inset: 0, background: "rgba(14,12,31,0.5)", display: "grid", placeItems: "center", padding: "var(--spacing-xl)" }}>
-          <div style={{ background: "var(--color-canvas)", borderRadius: "var(--rounded-lg)", padding: "var(--spacing-xl)", maxWidth: "420px", width: "100%" }}>
-            <p style={{ margin: "0 0 12px", fontSize: "16px", fontVariationSettings: '"wght" 540' }}>
-              {noteFor.action === "completed" ? t("admin.withdrawals.completeTitle") : t("admin.withdrawals.rejectTitle")}
-            </p>
-            {noteFor.action === "completed" && (
-              <p style={{ margin: "0 0 12px", fontSize: "13px", color: "var(--color-ink-mute)" }}>
-                {t("admin.withdrawals.manualNote")}
-              </p>
-            )}
-            <textarea value={note} onChange={(e) => setNote(e.target.value)} placeholder={t("admin.withdrawals.notePlaceholder")}
-              style={{ width: "100%", minHeight: "80px", padding: "10px 12px", border: "1px solid var(--color-hairline)", borderRadius: "var(--rounded-sm)", fontSize: "14px", boxSizing: "border-box" }} />
-            <div style={{ display: "flex", gap: "var(--spacing-md)", marginTop: "var(--spacing-lg)" }}>
-              <button type="button" disabled={busy} onClick={() => void confirmAction()}
-                style={{ ...btnStyle, background: noteFor.action === "completed" ? "var(--color-surface-teal-deep)" : "#b3261e", color: "#fff" }}>
-                {noteFor.action === "completed" ? t("admin.withdrawals.completeConfirm") : t("admin.withdrawals.rejectConfirm")}
-              </button>
-              <button type="button" onClick={() => setNoteFor(null)} style={{ ...btnStyle, border: "1px solid var(--color-hairline)", background: "transparent" }}>
-                {t("common.cancel")}
-              </button>
-            </div>
+        <Modal
+          open
+          onClose={() => setNoteFor(null)}
+          title={
+            noteFor.action === "completed"
+              ? t("admin.withdrawals.completeTitle")
+              : t("admin.withdrawals.rejectTitle")
+          }
+        >
+          {noteFor.action === "completed" && (
+            <p className="mb-3 text-[13px] text-ink-mute">{t("admin.withdrawals.manualNote")}</p>
+          )}
+          <Textarea
+            value={note}
+            onChange={(e) => setNote(e.target.value)}
+            placeholder={t("admin.withdrawals.notePlaceholder")}
+            rows={3}
+          />
+          <div className="mt-4 flex justify-end gap-2">
+            <Button variant="outline" onClick={() => setNoteFor(null)}>
+              {t("common.cancel")}
+            </Button>
+            <Button
+              variant={noteFor.action === "completed" ? "success" : "danger"}
+              loading={busy}
+              onClick={() => void confirmAction()}
+            >
+              {noteFor.action === "completed"
+                ? t("admin.withdrawals.completeConfirm")
+                : t("admin.withdrawals.rejectConfirm")}
+            </Button>
           </div>
-        </div>
+        </Modal>
       )}
-    </div>
+    </>
   );
 }
