@@ -1,11 +1,16 @@
 // apps/web/src/hooks/useSupport.ts
 // Support tickets (user side, §6.8) — own tickets + their replies via RLS.
+// Ticket list is server-side paginated via .range() + count.
 import { useCallback, useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import type { SupportReply, SupportTicket } from "@wa-marketing-bd/shared-types";
 
-export function useSupport(): {
+export function useSupport(
+  page = 1,
+  pageSize = 10,
+): {
   tickets: SupportTicket[];
+  total: number;
   isLoading: boolean;
   error: string | null;
   reload: () => void;
@@ -14,6 +19,7 @@ export function useSupport(): {
   loadReplies: (ticketId: string) => Promise<SupportReply[]>;
 } {
   const [tickets, setTickets] = useState<SupportTicket[]>([]);
+  const [total, setTotal] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [tick, setTick] = useState(0);
@@ -24,19 +30,22 @@ export function useSupport(): {
     void (async () => {
       setIsLoading(true);
       setError(null);
-      const { data, error: dbError } = await supabase
+      const from = (page - 1) * pageSize;
+      const to = from + pageSize - 1;
+      const { data, count, error: dbError } = await supabase
         .from("support_tickets")
-        .select("*")
+        .select("*", { count: "exact" })
         .order("created_at", { ascending: false })
-        .limit(50);
+        .range(from, to);
       if (dbError !== null) {
         setError("load_failed");
       } else {
         setTickets((data ?? []) as SupportTicket[]);
+        setTotal(count ?? 0);
       }
       setIsLoading(false);
     })();
-  }, [tick]);
+  }, [tick, page, pageSize]);
 
   async function createTicket(subject: string, message: string): Promise<string | null> {
     const { data, error: dbError } = await supabase
@@ -69,5 +78,5 @@ export function useSupport(): {
     return (data ?? []) as SupportReply[];
   }
 
-  return { tickets, isLoading, error, reload, createTicket, addReply, loadReplies };
+  return { tickets, total, isLoading, error, reload, createTicket, addReply, loadReplies };
 }

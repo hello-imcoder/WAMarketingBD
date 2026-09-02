@@ -85,7 +85,9 @@
     "email": "Email",
     "back": "Back",
     "cancel": "Cancel",
-    "retry": "Retry"
+    "retry": "Retry",
+    "close": "Close",
+    "openMenu": "Open menu"
   },
   "landing": {
     "meta": {
@@ -206,7 +208,12 @@
       "p2p": "P2P",
       "wallet": "Wallet",
       "history": "History",
-      "settings": "Settings"
+      "settings": "Settings",
+      "title": "Account"
+    },
+    "notice": {
+      "title": "New Notice",
+      "confirm": "Understood"
     }
   },
   "task": {
@@ -239,7 +246,9 @@
       "uploading": "Uploading…",
       "submitted": "Submitted! It is now pending review.",
       "rejectionReason": "Reason",
-      "screenshotRequired": "A screenshot is required to submit this task."
+      "screenshotRequired": "A screenshot is required to submit this task.",
+      "chooseFile": "Choose screenshot",
+      "viewScreenshot": "View screenshot"
     },
     "error": {
       "loadFailed": "Could not load tasks. Please try again.",
@@ -281,13 +290,23 @@
       "amount": "Amount (BDT)",
       "account": "Account number",
       "submit": "Request withdrawal",
-      "success": "Withdrawal request submitted! It is now pending review."
+      "success": "Withdrawal request submitted! It is now pending review.",
+      "confirmTitle": "Confirm withdrawal request",
+      "confirmMessage": "Request a ৳{{amount}} withdrawal via {{provider}}? This cannot be undone."
     },
     "error": {
       "loadFailed": "Could not load your wallet. Please try again.",
       "belowMin": "Minimum withdrawal amount is ৳{{min}}.",
       "overBalance": "Amount exceeds your verified balance."
-    }
+    },
+    "insights": {
+      "cardTitle": "Earnings (last 14 days)",
+      "title": "Earnings, last 14 days",
+      "series": "Earned",
+      "empty": "No approved earnings yet — complete a task to see your chart here."
+    },
+    "historyEmpty": "No withdrawals yet",
+    "historyEmptyHint": "Your withdrawal requests will appear here once you make one."
   },
   "p2p": {
     "meta": {
@@ -312,7 +331,14 @@
       "banned": "This transfer is not allowed (account suspended).",
       "rateLimited": "Too many attempts. Please try again later.",
       "generic": "Transfer failed. Please try again."
-    }
+    },
+    "step": {
+      "recipient": "Recipient",
+      "amount": "Amount",
+      "done": "Done"
+    },
+    "confirmTitle": "Confirm transfer",
+    "confirmMessage": "Send ৳{{amount}} to {{name}}? This cannot be undone."
   },
   "referral": {
     "title": "Refer & earn",
@@ -365,6 +391,12 @@
     "empty": "Nothing here yet.",
     "error": {
       "loadFailed": "Could not load history. Please try again."
+    },
+    "col": {
+      "entry": "Entry",
+      "date": "Date",
+      "status": "Status",
+      "amount": "Amount"
     }
   },
   "support": {
@@ -389,7 +421,8 @@
       "reply_failed": "Could not send the reply. Please try again.",
       "load_failed": "Could not load your tickets."
     },
-    "noticeLabel": "Notice"
+    "noticeLabel": "Notice",
+    "replySent": "Reply sent"
   },
   "admin": {
     "nav": {

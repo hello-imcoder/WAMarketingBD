@@ -1,8 +1,10 @@
 // apps/web/src/components/user/TaskCard.tsx
-// Task list card — number, message excerpt, payout, deadline, state badge.
+// Task list card — payout, message excerpt, deadline, state badge.
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router";
+import { Clock } from "lucide-react";
 import type { TaskWithStatus } from "@/hooks/useTasks";
+import { Badge, statusTone } from "@/components/app/ui";
 
 export function TaskCard({ entry }: { entry: TaskWithStatus }): React.ReactElement {
   const { t } = useTranslation();
@@ -11,44 +13,19 @@ export function TaskCard({ entry }: { entry: TaskWithStatus }): React.ReactEleme
   return (
     <Link
       to={`/app/task/${task.id}`}
-      style={{
-        display: "block",
-        border: "1px solid var(--color-hairline)",
-        borderRadius: "var(--rounded-lg)",
-        padding: "var(--spacing-xl)",
-        textDecoration: "none",
-        color: "inherit",
-        background: "var(--color-canvas)",
-      }}
+      className="flex h-full flex-col gap-2 rounded-xl border border-hairline bg-canvas p-4 shadow-1 no-underline transition-colors hover:border-ink-faint"
     >
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "baseline",
-          gap: "var(--spacing-md)",
-          marginBottom: "var(--spacing-sm)",
-        }}
-      >
-        <strong style={{ fontSize: "18px", fontVariationSettings: '"wght" 540' }}>
-          ৳{task.payout_amount}
-        </strong>
-        <span
-          style={{
-            fontSize: "12px",
-            fontVariationSettings: '"wght" 600',
-            color: submission !== null ? "#1a7a3c" : "var(--color-ink-mute)",
-          }}
-        >
+      <div className="flex items-center justify-between gap-2">
+        <strong className="wt-540 text-lg text-ink">৳{task.payout_amount}</strong>
+        <Badge tone={submission !== null ? statusTone(submission.status) : "active"}>
           {submission !== null
             ? t(`task.status.${submission.status}`)
             : t("task.status.available")}
-        </span>
+        </Badge>
       </div>
-      <p style={{ margin: 0, color: "var(--color-ink-mute)", fontSize: "14px" }}>
-        {task.message.length > 80 ? `${task.message.slice(0, 80)}…` : task.message}
-      </p>
-      <p style={{ margin: "8px 0 0", color: "var(--color-ink-faint)", fontSize: "12px" }}>
+      <p className="m-0 line-clamp-2 text-sm text-ink-mute">{task.message}</p>
+      <p className="mt-auto mb-0 flex items-center gap-1.5 text-xs text-ink-faint">
+        <Clock size={12} />
         {t("task.card.deadline")}: {new Date(task.expires_at).toLocaleString()}
       </p>
     </Link>

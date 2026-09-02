@@ -4,14 +4,30 @@
 // pre-fill works since Milestone 3.
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
+import { Copy, Gift, Users } from "lucide-react";
 import { useReferrals } from "@/hooks/useReferrals";
 import { useAuthStore } from "@/stores/authStore";
+import {
+  Badge,
+  Button,
+  Card,
+  CardBody,
+  CardHeader,
+  EmptyState,
+  ListSkeleton,
+  Pagination,
+  statusTone,
+  useToast,
+} from "@/components/app/ui";
+
+const REF_PAGE_SIZE = 10;
 
 export function ReferralCard(): React.ReactElement | null {
   const { t } = useTranslation();
   const { profile } = useAuthStore();
-  const { referrals, isLoading, error } = useReferrals();
-  const [copied, setCopied] = useState(false);
+  const [page, setPage] = useState(1);
+  const { referrals, total, isLoading, error } = useReferrals(page, REF_PAGE_SIZE);
+  const { success: toastSuccess } = useToast();
 
   if (profile === null) return null;
   const code = profile.referral_code;
@@ -20,74 +36,69 @@ export function ReferralCard(): React.ReactElement | null {
   async function copyLink(): Promise<void> {
     try {
       await navigator.clipboard.writeText(link);
-      setCopied(true);
-      window.setTimeout(() => setCopied(false), 1500);
+      toastSuccess(t("referral.copied"));
     } catch {
       // clipboard unavailable — ignore
     }
   }
 
   return (
-    <section style={{ marginBottom: "var(--spacing-xxl)" }}>
-      <h2 style={{ fontSize: "20px", fontVariationSettings: '"wght" 540', margin: "0 0 8px" }}>
-        {t("referral.title")}
-      </h2>
-      <p style={{ color: "var(--color-ink-mute)", fontSize: "14px", margin: "0 0 16px" }}>
-        {t("referral.description")}
-      </p>
-
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          gap: "var(--spacing-md)",
-          border: "1px solid var(--color-hairline)",
-          borderRadius: "var(--rounded-md)",
-          padding: "var(--spacing-lg)",
-          marginBottom: "var(--spacing-lg)",
-        }}
-      >
-        <code style={{ fontSize: "18px", fontVariationSettings: '"wght" 540', letterSpacing: "2px" }}>
-          {code}
-        </code>
-        <button
-          type="button"
-          className="auth-submit-btn"
-          style={{ maxWidth: "160px", marginBottom: 0 }}
-          onClick={() => void copyLink()}
-        >
-          {copied ? t("referral.copied") : t("referral.copyLink")}
-        </button>
-      </div>
-
-      {isLoading && <p role="status">{t("common.loading")}</p>}
-      {error !== null && (
-        <p role="alert" className="auth-error">
-          {t("referral.error.loadFailed")}
-        </p>
-      )}
-      {!isLoading && error === null && referrals.length === 0 && (
-        <p style={{ color: "var(--color-ink-mute)", fontSize: "14px" }}>{t("referral.empty")}</p>
-      )}
-      {referrals.map((r) => (
-        <div
-          key={r.id}
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            borderBottom: "1px solid var(--color-hairline)",
-            padding: "var(--spacing-md) 0",
-            fontSize: "14px",
-          }}
-        >
-          <span>
-            {t("referral.bonusAmount")}: ৳{r.bonus_amount}
-          </span>
-          <span style={{ color: r.bonus_paid ? "#1a7a3c" : "var(--color-ink-mute)" }}>
-            {r.bonus_paid ? t("referral.paid") : t("referral.pendingBonus")}
-          </span>
+    <Card>
+      <CardHeader
+        title={t("referral.title")}
+        description={t("referral.description")}
+        icon={<Gift size={18} />}
+      />
+      <CardBody className="flex flex-col gap-4">
+        <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg bg-canvas-soft px-4 py-3">
+          <code className="wt-540 text-lg tracking-widest text-ink">{code}</code>
+          <Button variant="outline" size="sm" onClick={() => void copyLink()}>
+            <Copy size={14} />
+            {t("referral.copyLink")}
+          </Button>
         </div>
-      ))}
-    </section>
+
+        {isLoading && <ListSkeleton rows={3} rowClass="h-12" />}
+
+        {error !== null && (
+          <p role="alert" className="m-0 text-sm text-danger">
+            {t("referral.error.loadFailed")}
+          </p>
+        )}
+
+        {!isLoading && error === null && referrals.length === 0 ? (
+          <EmptyState
+            icon={<Users size={28} />}
+            title={t("referral.empty")}
+          />
+        ) : (
+          referrals.length > 0 && (
+            <>
+              <div className="divide-y divide-hairline overflow-hidden rounded-lg border border-hairline">
+                {referrals.map((r) => (
+                  <div
+                    key={r.id}
+                    className="flex items-center justify-between gap-2 px-4 py-3"
+                  >
+                    <span className="text-sm text-ink">
+                      {t("referral.bonusAmount")}: <span className="wt-540">৳{r.bonus_amount}</span>
+                    </span>
+                    <Badge tone={r.bonus_paid ? statusTone("approved") : statusTone("pending")}>
+                      {r.bonus_paid ? t("referral.paid") : t("referral.pendingBonus")}
+                    </Badge>
+                  </div>
+                ))}
+              </div>
+              <Pagination
+                page={page}
+                pageSize={REF_PAGE_SIZE}
+                total={total}
+                onPage={setPage}
+              />
+            </>
+          )
+        )}
+      </CardBody>
+    </Card>
   );
 }

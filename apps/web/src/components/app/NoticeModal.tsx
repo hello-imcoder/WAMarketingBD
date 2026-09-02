@@ -1,86 +1,41 @@
+// apps/web/src/components/app/NoticeModal.tsx
+// Admin notice / support notice popup — built on the app UI kit Modal.
+// Same props API as before (onDismiss, noticeText); content i18n'd.
+// The body scrolls (max-h) so long notices never push the confirm button
+// off-screen, and break-words keeps long unbroken strings from overflowing.
+import { useTranslation } from "react-i18next";
+import { Bell } from "lucide-react";
+import { Button, Modal } from "@/components/app/ui";
+
 interface NoticeModalProps {
   onDismiss: () => void;
   noticeText: string;
 }
 
 export function NoticeModal({ onDismiss, noticeText }: NoticeModalProps) {
+  const { t } = useTranslation();
   return (
-    <div
-      style={{
-        position: "fixed",
-        inset: 0,
-        backgroundColor: "rgba(0, 0, 0, 0.7)",
-        zIndex: 9999,
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        padding: "var(--spacing-md)",
-      }}
+    <Modal
+      open
+      onClose={onDismiss}
+      title={t("app.notice.title")}
+      maxWidth="max-w-md"
     >
-      <div
-        style={{
-          background: "var(--color-primary)",
-          borderRadius: "var(--rounded-xl)",
-          width: "100%",
-          maxWidth: "400px",
-          padding: "var(--spacing-xl)",
-          color: "var(--color-on-primary)",
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          boxShadow: "0 10px 25px rgba(0,0,0,0.5)",
-        }}
-      >
-        <div style={{ fontSize: "48px", marginBottom: "var(--spacing-md)" }}>
-          🔔
+      <div className="flex flex-col gap-4">
+        <div className="flex items-start gap-3">
+          <span className="mt-0.5 grid size-9 shrink-0 place-items-center rounded-full bg-info-soft text-info">
+            <Bell size={18} />
+          </span>
+          <div
+            className="min-w-0 flex-1 max-h-[45dvh] overflow-y-auto whitespace-pre-wrap break-words rounded-lg bg-canvas-soft p-4 text-left text-sm leading-relaxed text-ink"
+          >
+            {noticeText}
+          </div>
         </div>
-        <h2
-          style={{
-            fontSize: "24px",
-            fontVariationSettings: '"wght" 600',
-            margin: "0 0 var(--spacing-lg) 0",
-            color: "#60a5fa",
-          }}
-        >
-          New Notice
-        </h2>
-        
-        <div
-          style={{
-            background: "var(--color-primary-deep)",
-            padding: "var(--spacing-lg)",
-            borderRadius: "var(--rounded-lg)",
-            width: "100%",
-            maxHeight: "350px",
-            overflowY: "auto",
-            marginBottom: "var(--spacing-xl)",
-            lineHeight: 1.6,
-            fontSize: "15px",
-            textAlign: "center",
-            whiteSpace: "pre-wrap",
-          }}
-        >
-          {noticeText}
-        </div>
-
-        <button
-          onClick={onDismiss}
-          style={{
-            background: "#8b5cf6",
-            color: "white",
-            border: "none",
-            borderRadius: "var(--rounded-full)",
-            padding: "var(--spacing-md) var(--spacing-xxl)",
-            fontSize: "16px",
-            fontVariationSettings: '"wght" 600',
-            cursor: "pointer",
-            width: "100%",
-            maxWidth: "250px",
-          }}
-        >
-          Understood ✅
-        </button>
+        <Button variant="primary" onClick={onDismiss} className="w-full">
+          {t("app.notice.confirm")}
+        </Button>
       </div>
-    </div>
+    </Modal>
   );
 }

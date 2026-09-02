@@ -15,6 +15,14 @@
 import { useEffect, useState, type ChangeEvent } from "react";
 import { useTranslation } from "react-i18next";
 import { Link, useNavigate, useParams } from "react-router";
+import {
+  ArrowLeft,
+  CheckCircle2,
+  Clock,
+  ImagePlus,
+  MessageCircle,
+  Send,
+} from "lucide-react";
 import { applySeo } from "@/lib/seo";
 import { invokeEdgeFunction, EdgeFunctionError } from "@/lib/edgeFunctions";
 import { uploadScreenshot, sha256Hex } from "@/lib/cloudinary";
@@ -23,6 +31,17 @@ import { supabase } from "@/lib/supabase";
 import { useAuthStore } from "@/stores/authStore";
 import { useTaskDetail } from "@/hooks/useTasks";
 import { taskSubmissionSchema } from "@/lib/validators";
+import {
+  Badge,
+  Button,
+  Card,
+  CardBody,
+  CardHeader,
+  ListSkeleton,
+  Modal,
+  statusTone,
+  useToast,
+} from "@/components/app/ui";
 import type { ScreenshotMode } from "@wa-marketing-bd/shared-types";
 
 interface CreateSubmissionResponse {
@@ -49,13 +68,13 @@ export default function TaskDetailPage(): React.ReactElement {
   const { taskId } = useParams<{ taskId: string }>();
   const { session } = useAuthStore();
   const { entry, isLoading, error } = useTaskDetail(taskId, session);
+  const { success: toastSuccess, error: toastError } = useToast();
 
   const [waLinkClicked, setWaLinkClicked] = useState(false);
   const [file, setFile] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
-  const [success, setSuccess] = useState(false);
   const [screenshotMode, setScreenshotMode] = useState<ScreenshotMode>("optional");
 
   useEffect(() => {
@@ -157,24 +176,25 @@ export default function TaskDetailPage(): React.ReactElement {
         });
         if (insertError !== null) {
           // unique violation 23505 → duplicate submission
-          if (insertError.code === "23505") {
-            setErrorMsg(t("task.error.alreadySubmitted"));
-          } else {
-            setErrorMsg(t("task.error.generic"));
-          }
           setIsUploading(false);
+          if (insertError.code === "23505") {
+            toastError(t("task.error.alreadySubmitted"));
+          } else {
+            toastError(t("task.error.generic"));
+          }
+          setIsSubmitting(false);
           return;
         }
       }
 
-      setSuccess(true);
+      toastSuccess(t("task.detail.submitted"));
       window.setTimeout(() => void navigate("/app/task"), 1200);
     } catch (err) {
       setIsUploading(false);
       if (err instanceof EdgeFunctionError) {
-        setErrorMsg(t(`task.error.${EDGE_ERROR_KEYS[err.code] ?? "generic"}`));
+        toastError(t(`task.error.${EDGE_ERROR_KEYS[err.code] ?? "generic"}`));
       } else {
-        setErrorMsg(t("task.error.uploadFailed"));
+        toastError(t("task.error.uploadFailed"));
       }
     } finally {
       setIsSubmitting(false);
@@ -183,39 +203,40 @@ export default function TaskDetailPage(): React.ReactElement {
 
   if (isLoading) {
     return (
-      <main style={{ padding: "var(--spacing-xl)" }} role="status">
-        {t("common.loading")}
-      </main>
+      <div className="flex flex-col gap-4" role="status" aria-label={t("common.loading")}>
+        <ListSkeleton rows={3} />
+      </div>
     );
   }
 
   if (error !== null || entry === null) {
     return (
-      <main style={{ padding: "var(--spacing-xl)" }}>
-        <p role="alert" className="auth-error">
+      <div>
+        <p role="alert" className="text-sm text-danger">
           {t("task.error.notFound")}
         </p>
         <Link to="/app/task" className="auth-link">
           {t("common.back")}
         </Link>
-      </main>
+      </div>
     );
   }
 
-  return <TaskDetailBody
-    task={entry.task}
-    submission={entry.submission}
-    waLinkClicked={waLinkClicked}
-    file={file}
-    isUploading={isUploading}
-    isSubmitting={isSubmitting}
-    errorMsg={errorMsg}
-    success={success}
-    screenshotMode={screenshotMode}
-    onOpenWhatsApp={openWhatsApp}
-    onFileChange={onFileChange}
-    onSubmit={() => void handleSubmit()}
-  />;
+  return (
+    <TaskDetailBody
+      task={entry.task}
+      submission={entry.submission}
+      waLinkClicked={waLinkClicked}
+      file={file}
+      isUploading={isUploading}
+      isSubmitting={isSubmitting}
+      errorMsg={errorMsg}
+      screenshotMode={screenshotMode}
+      onOpenWhatsApp={openWhatsApp}
+      onFileChange={onFileChange}
+      onSubmit={() => void handleSubmit()}
+    />
+  );
 }
 
 // ─── Presentational body ──────────────────────────────────────────────────────
@@ -228,7 +249,6 @@ interface BodyProps {
   isUploading: boolean;
   isSubmitting: boolean;
   errorMsg: string | null;
-  success: boolean;
   screenshotMode: ScreenshotMode;
   onOpenWhatsApp: (number: string, message: string) => void;
   onFileChange: (e: ChangeEvent<HTMLInputElement>) => void;
@@ -243,7 +263,6 @@ function TaskDetailBody({
   isUploading,
   isSubmitting,
   errorMsg,
-  success,
   screenshotMode,
   onOpenWhatsApp,
   onFileChange,
@@ -251,133 +270,185 @@ function TaskDetailBody({
 }: BodyProps): React.ReactElement {
   const { t } = useTranslation();
   const alreadySubmitted = submission !== null;
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [lightboxOpen, setLightboxOpen] = useState(false);
+
+  // Local preview of the chosen screenshot (revoked when it changes).
+  useEffect(() => {
+    if (file === null) {
+      setPreviewUrl(null);
+      return;
+    }
+    const url = URL.createObjectURL(file);
+    setPreviewUrl(url);
+    return () => URL.revokeObjectURL(url);
+  }, [file]);
 
   return (
-    <main
-      style={{
-        padding: "var(--spacing-xl)",
-        maxWidth: "640px",
-        margin: "0 auto",
-        paddingBottom: "96px",
-      }}
-    >
-      <Link to="/app/task" className="auth-link" style={{ fontSize: "14px" }}>
-        ← {t("common.back")}
-      </Link>
+    <div className="mx-auto flex max-w-2xl flex-col gap-4">
+      <div>
+        <Button variant="ghost" size="sm" to="/app/task">
+          <ArrowLeft size={16} />
+          {t("common.back")}
+        </Button>
+      </div>
 
-      <h1 style={{ fontSize: "28px", fontVariationSettings: '"wght" 540', margin: "16px 0 8px" }}>
-        ৳{task.payout_amount}
-      </h1>
-      <p style={{ color: "var(--color-ink-mute)", margin: "0 0 24px" }}>
+      {/* ── Payout + deadline ─────────────────────────────────────────── */}
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <h1 className="wt-540 m-0 text-3xl text-ink">৳{task.payout_amount}</h1>
+        {alreadySubmitted && (
+          <Badge tone={statusTone(submission.status)}>
+            {t(`task.status.${submission.status}`)}
+          </Badge>
+        )}
+      </div>
+      <p className="m-0 flex items-center gap-1.5 text-[13px] text-ink-mute">
+        <Clock size={14} />
         {t("task.card.deadline")}: {new Date(task.expires_at).toLocaleString()}
       </p>
 
-      <section
-        style={{
-          border: "1px solid var(--color-hairline)",
-          borderRadius: "var(--rounded-lg)",
-          padding: "var(--spacing-xl)",
-          marginBottom: "var(--spacing-xl)",
-        }}
-      >
-        <h2 style={{ fontSize: "16px", fontVariationSettings: '"wght" 600', margin: "0 0 8px" }}>
-          {t("task.detail.whatsappNumber")}
-        </h2>
-        <p style={{ margin: "0 0 16px", fontFamily: "monospace", fontSize: "18px" }}>
-          {task.whatsapp_number}
-        </p>
-        <h2 style={{ fontSize: "16px", fontVariationSettings: '"wght" 600', margin: "0 0 8px" }}>
-          {t("task.detail.message")}
-        </h2>
-        <p
-          style={{
-            margin: "0 0 16px",
-            whiteSpace: "pre-wrap",
-            background: "var(--color-canvas-soft)",
-            padding: "var(--spacing-lg)",
-            borderRadius: "var(--rounded-md)",
-          }}
-        >
-          {task.message}
-        </p>
-        <button
-          type="button"
-          className="auth-submit-btn"
-          onClick={() => onOpenWhatsApp(task.whatsapp_number, task.message)}
-          disabled={alreadySubmitted}
-        >
-          {t("task.detail.openWhatsApp")}
-        </button>
-        {waLinkClicked && !alreadySubmitted && (
-          <p style={{ fontSize: "12px", color: "var(--color-ink-faint)", margin: "8px 0 0" }}>
-            {t("task.detail.linkClicked")}
+      {/* ── WhatsApp instructions ─────────────────────────────────────── */}
+      <Card>
+        <CardHeader
+          title={t("task.detail.whatsappNumber")}
+          icon={<MessageCircle size={18} />}
+        />
+        <CardBody className="flex flex-col gap-4">
+          <p className="wt-540 m-0 font-mono text-lg tracking-wide text-ink">
+            {task.whatsapp_number}
           </p>
-        )}
-      </section>
-
-      {alreadySubmitted ? (
-        <p role="status" className="settings-success">
-          {t(`task.status.${submission.status}`)}
-          {submission.rejection_reason !== null && (
-            <>
-              <br />
-              {t("task.detail.rejectionReason")}: {submission.rejection_reason}
-            </>
-          )}
-        </p>
-      ) : success ? (
-        <p role="status" className="settings-success">
-          {t("task.detail.submitted")}
-        </p>
-      ) : (
-        <section>
-          <h2 style={{ fontSize: "20px", fontVariationSettings: '"wght" 540', margin: "0 0 8px" }}>
-            {t("task.detail.submitTitle")}
-          </h2>
-
-          {/* Screenshot upload — hidden entirely in 'disabled' mode */}
-          {screenshotMode !== "disabled" && (
-            <>
-              <p style={{ color: "var(--color-ink-mute)", fontSize: "14px", margin: "0 0 16px" }}>
-                {screenshotMode === "must"
-                  ? t("task.detail.screenshotRequired")
-                  : t("task.detail.screenshotOptional")}
-              </p>
-
-              <input
-                type="file"
-                accept="image/*"
-                onChange={onFileChange}
-                style={{ marginBottom: "var(--spacing-lg)" }}
-              />
-              {file !== null && (
-                <p style={{ fontSize: "12px", color: "var(--color-ink-faint)", margin: "0 0 12px" }}>
-                  {file.name}
-                </p>
-              )}
-            </>
-          )}
-
-          {errorMsg !== null && (
-            <p role="alert" className="auth-error">
-              {errorMsg}
+          <div>
+            <h2 className="wt-540 mb-1 mt-0 text-sm text-ink-mute">
+              {t("task.detail.message")}
+            </h2>
+            <p className="m-0 whitespace-pre-wrap rounded-md bg-canvas-soft p-3 text-sm text-ink">
+              {task.message}
+            </p>
+          </div>
+          <Button
+            variant="primary"
+            loading={false}
+            onClick={() => onOpenWhatsApp(task.whatsapp_number, task.message)}
+            disabled={alreadySubmitted}
+            className="w-full sm:w-auto"
+          >
+            <Send size={16} />
+            {t("task.detail.openWhatsApp")}
+          </Button>
+          {waLinkClicked && !alreadySubmitted && (
+            <p className="m-0 flex items-center gap-1.5 text-xs text-ink-faint">
+              <CheckCircle2 size={13} className="text-success" />
+              {t("task.detail.linkClicked")}
             </p>
           )}
+        </CardBody>
+      </Card>
 
-          <button
-            type="button"
-            className="auth-submit-btn"
-            onClick={onSubmit}
-            disabled={isSubmitting || isUploading || (screenshotMode === "must" && file === null)}
-          >
-            {isUploading
-              ? t("task.detail.uploading")
-              : isSubmitting
-                ? t("common.saving")
+      {/* ── Status / submit ───────────────────────────────────────────── */}
+      {alreadySubmitted ? (
+        <Card>
+          <CardBody className="flex flex-col gap-2">
+            <div className="flex items-center gap-2">
+              <CheckCircle2
+                size={18}
+                className={submission.status === "rejected" ? "text-danger" : "text-success"}
+              />
+              <span className="wt-540 text-sm text-ink">
+                {t(`task.status.${submission.status}`)}
+              </span>
+            </div>
+            {submission.rejection_reason !== null && (
+              <p className="m-0 text-sm text-danger">
+                {t("task.detail.rejectionReason")}: {submission.rejection_reason}
+              </p>
+            )}
+          </CardBody>
+        </Card>
+      ) : (
+        <Card>
+          <CardHeader title={t("task.detail.submitTitle")} icon={<ImagePlus size={18} />} />
+          <CardBody className="flex flex-col gap-4">
+            {/* Screenshot upload — hidden entirely in 'disabled' mode */}
+            {screenshotMode !== "disabled" && (
+              <>
+                <p className="m-0 text-[13px] text-ink-mute">
+                  {screenshotMode === "must"
+                    ? t("task.detail.screenshotRequired")
+                    : t("task.detail.screenshotOptional")}
+                </p>
+
+                <div className="flex flex-wrap items-center gap-3">
+                  <label className="cursor-pointer">
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={onFileChange}
+                      className="hidden"
+                    />
+                    <span className="inline-flex h-10 items-center gap-2 rounded-md border border-hairline bg-canvas px-4 text-sm text-ink transition-colors hover:bg-canvas-soft">
+                      <ImagePlus size={16} />
+                      {t("task.detail.chooseFile")}
+                    </span>
+                  </label>
+                  {previewUrl !== null && (
+                    <button
+                      type="button"
+                      onClick={() => setLightboxOpen(true)}
+                      className="cursor-pointer overflow-hidden rounded-md border border-hairline"
+                      aria-label={t("task.detail.viewScreenshot")}
+                    >
+                      <img
+                        src={previewUrl}
+                        alt={file?.name ?? ""}
+                        className="h-14 w-14 object-cover"
+                      />
+                    </button>
+                  )}
+                  {file !== null && (
+                    <p className="m-0 max-w-full truncate text-xs text-ink-faint">
+                      {file.name}
+                    </p>
+                  )}
+                </div>
+              </>
+            )}
+
+            {errorMsg !== null && (
+              <p role="alert" className="m-0 text-sm text-danger">
+                {errorMsg}
+              </p>
+            )}
+
+            <Button
+              variant="primary"
+              loading={isUploading || isSubmitting}
+              disabled={screenshotMode === "must" && file === null}
+              onClick={onSubmit}
+              className="w-full sm:w-auto"
+            >
+              {isUploading
+                ? t("task.detail.uploading")
                 : t("task.detail.submitButton")}
-          </button>
-        </section>
+            </Button>
+          </CardBody>
+        </Card>
       )}
-    </main>
+
+      {/* ── Screenshot lightbox ───────────────────────────────────────── */}
+      <Modal
+        open={lightboxOpen}
+        onClose={() => setLightboxOpen(false)}
+        title={file?.name ?? t("task.detail.viewScreenshot")}
+        maxWidth="max-w-3xl"
+      >
+        {previewUrl !== null && (
+          <img
+            src={previewUrl}
+            alt={file?.name ?? ""}
+            className="max-h-[70dvh] w-full rounded-lg object-contain"
+          />
+        )}
+      </Modal>
+    </div>
   );
 }

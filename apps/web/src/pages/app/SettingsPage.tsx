@@ -5,6 +5,15 @@
 // Support, Logout.
 import { useState, type FormEvent } from "react";
 import { useTranslation } from "react-i18next";
+import {
+  ArrowLeft,
+  ChevronRight,
+  KeyRound,
+  LifeBuoy,
+  LogOut,
+  UserRound,
+} from "lucide-react";
+import type { ReactNode } from "react";
 import { supabase } from "@/lib/supabase";
 import { useAuthStore } from "@/stores/authStore";
 import {
@@ -17,25 +26,23 @@ import { LogoutButton } from "@/components/auth/LogoutButton";
 import { SupportSection } from "@/components/user/SupportSection";
 import { applySeo } from "@/lib/seo";
 import { useEffect } from "react";
+import { Button, Card, CardBody, CardHeader, PageHeader } from "@/components/app/ui";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 type Section = "profile" | "password" | "support" | "logout";
 
-// ─── Shared back-button style ─────────────────────────────────────────────────
+// ─── Shared back button ───────────────────────────────────────────────────────
 
-const backBtnStyle: React.CSSProperties = {
-  display: "inline-flex",
-  alignItems: "center",
-  gap: "6px",
-  background: "none",
-  border: "none",
-  padding: "0 0 var(--spacing-xl) 0",
-  fontSize: "15px",
-  color: "var(--color-ink-mute)",
-  cursor: "pointer",
-  fontVariationSettings: '"wght" 500',
-};
+function BackButton({ onBack }: { onBack: () => void }): React.ReactElement {
+  const { t } = useTranslation();
+  return (
+    <Button variant="ghost" size="sm" onClick={onBack}>
+      <ArrowLeft size={16} />
+      {t("common.back")}
+    </Button>
+  );
+}
 
 // ─── Profile section ──────────────────────────────────────────────────────────
 
@@ -92,67 +99,52 @@ function ProfileSection({ onBack }: { onBack: () => void }): React.ReactElement 
   }
 
   return (
-    <section className="settings-section" style={{ borderBottom: "none" }}>
-      <button type="button" style={backBtnStyle} onClick={onBack}>
-        ← {t("common.back")}
-      </button>
-      <h2 className="settings-section-title">{t("settings.profile.title")}</h2>
+    <Card>
+      <CardHeader title={t("settings.profile.title")} icon={<UserRound size={18} />} />
+      <CardBody className="flex flex-col gap-4">
+        <BackButton onBack={onBack} />
 
-      <form onSubmit={(e) => void handleSubmit(e)} noValidate>
-        <AuthInputField
-          id="settings-name"
-          label={t("settings.profile.nameLabel")}
-          type="text"
-          autoComplete="name"
-          placeholder={t("settings.profile.namePlaceholder")}
-          value={name}
-          onChange={setName}
-        />
+        <form onSubmit={(e) => void handleSubmit(e)} noValidate className="flex flex-col gap-4">
+          <AuthInputField
+            id="settings-name"
+            label={t("settings.profile.nameLabel")}
+            type="text"
+            autoComplete="name"
+            placeholder={t("settings.profile.namePlaceholder")}
+            value={name}
+            onChange={setName}
+          />
 
-        <AuthInputField
-          id="settings-email"
-          label={t("settings.profile.emailLabel")}
-          type="email"
-          autoComplete="email"
-          placeholder={t("settings.profile.emailPlaceholder")}
-          value={email}
-          onChange={setEmail}
-        />
+          <AuthInputField
+            id="settings-email"
+            label={t("settings.profile.emailLabel")}
+            type="email"
+            autoComplete="email"
+            placeholder={t("settings.profile.emailPlaceholder")}
+            value={email}
+            onChange={setEmail}
+          />
 
-        <p
-          style={{
-            fontFamily: "var(--font-sans)",
-            fontSize: "var(--text-caption-size)",
-            color: "var(--color-ink-mute)",
-            marginBottom: "var(--spacing-lg)",
-            marginTop: "calc(-1 * var(--spacing-sm))",
-          }}
-        >
-          {t("settings.profile.emailHint")}
-        </p>
+          <p className="m-0 text-xs text-ink-mute">{t("settings.profile.emailHint")}</p>
 
-        {error !== null && (
-          <p role="alert" className="auth-error">
-            {error}
-          </p>
-        )}
+          {error !== null && (
+            <p role="alert" className="m-0 text-sm text-danger">
+              {error}
+            </p>
+          )}
 
-        {success && (
-          <p role="status" className="settings-success">
-            {t("settings.profile.savedMessage")}
-          </p>
-        )}
+          {success && (
+            <p role="status" className="m-0 text-sm text-success">
+              {t("settings.profile.savedMessage")}
+            </p>
+          )}
 
-        <button
-          type="submit"
-          disabled={isSaving}
-          className="auth-submit-btn"
-          style={{ maxWidth: "200px" }}
-        >
-          {isSaving ? t("common.saving") : t("settings.profile.saveButton")}
-        </button>
-      </form>
-    </section>
+          <Button type="submit" loading={isSaving} className="w-full sm:w-auto">
+            {t("settings.profile.saveButton")}
+          </Button>
+        </form>
+      </CardBody>
+    </Card>
   );
 }
 
@@ -213,67 +205,61 @@ function PasswordSection({ onBack }: { onBack: () => void }): React.ReactElement
   }
 
   return (
-    <section className="settings-section" style={{ borderBottom: "none" }}>
-      <button type="button" style={backBtnStyle} onClick={onBack}>
-        ← {t("common.back")}
-      </button>
-      <h2 className="settings-section-title">{t("settings.password.title")}</h2>
+    <Card>
+      <CardHeader title={t("settings.password.title")} icon={<KeyRound size={18} />} />
+      <CardBody className="flex flex-col gap-4">
+        <BackButton onBack={onBack} />
 
-      <form onSubmit={(e) => void handleSubmit(e)} noValidate>
-        <AuthInputField
-          id="settings-current-pw"
-          label={t("settings.password.currentLabel")}
-          type="password"
-          autoComplete="current-password"
-          placeholder={t("settings.password.currentPlaceholder")}
-          value={currentPassword}
-          onChange={setCurrentPassword}
-        />
+        <form onSubmit={(e) => void handleSubmit(e)} noValidate className="flex flex-col gap-4">
+          <AuthInputField
+            id="settings-current-pw"
+            label={t("settings.password.currentLabel")}
+            type="password"
+            autoComplete="current-password"
+            placeholder={t("settings.password.currentPlaceholder")}
+            value={currentPassword}
+            onChange={setCurrentPassword}
+          />
 
-        <AuthInputField
-          id="settings-new-pw"
-          label={t("settings.password.newLabel")}
-          type="password"
-          autoComplete="new-password"
-          placeholder={t("settings.password.newPlaceholder")}
-          value={newPassword}
-          onChange={setNewPassword}
-        />
+          <AuthInputField
+            id="settings-new-pw"
+            label={t("settings.password.newLabel")}
+            type="password"
+            autoComplete="new-password"
+            placeholder={t("settings.password.newPlaceholder")}
+            value={newPassword}
+            onChange={setNewPassword}
+          />
 
-        {error !== null && (
-          <p role="alert" className="auth-error">
-            {error}
-          </p>
-        )}
+          {error !== null && (
+            <p role="alert" className="m-0 text-sm text-danger">
+              {error}
+            </p>
+          )}
 
-        {success && (
-          <p role="status" className="settings-success">
-            {t("settings.password.successMessage")}
-          </p>
-        )}
+          {success && (
+            <p role="status" className="m-0 text-sm text-success">
+              {t("settings.password.successMessage")}
+            </p>
+          )}
 
-        <button
-          type="submit"
-          disabled={isSaving}
-          className="auth-submit-btn"
-          style={{ maxWidth: "220px" }}
-        >
-          {isSaving ? t("common.saving") : t("settings.password.submitButton")}
-        </button>
-      </form>
-    </section>
+          <Button type="submit" loading={isSaving} className="w-full sm:w-auto">
+            {t("settings.password.submitButton")}
+          </Button>
+        </form>
+      </CardBody>
+    </Card>
   );
 }
 
 // ─── Support wrapper (with Back button) ───────────────────────────────────────
 
 function SupportWrapper({ onBack }: { onBack: () => void }): React.ReactElement {
-  const { t } = useTranslation();
   return (
-    <div>
-      <button type="button" style={backBtnStyle} onClick={onBack}>
-        ← {t("common.back")}
-      </button>
+    <div className="flex flex-col gap-4">
+      <div>
+        <BackButton onBack={onBack} />
+      </div>
       <SupportSection />
     </div>
   );
@@ -284,33 +270,24 @@ function SupportWrapper({ onBack }: { onBack: () => void }): React.ReactElement 
 function LogoutSectionView({ onBack }: { onBack: () => void }): React.ReactElement {
   const { t } = useTranslation();
   return (
-    <section className="settings-section" style={{ borderBottom: "none" }}>
-      <button type="button" style={backBtnStyle} onClick={onBack}>
-        ← {t("common.back")}
-      </button>
-      <h2 className="settings-section-title">{t("auth.logout.title")}</h2>
-      <p
-        style={{
-          fontFamily: "var(--font-sans)",
-          fontSize: "var(--text-caption-size)",
-          color: "var(--color-ink-mute)",
-          margin: "calc(-1 * var(--spacing-md)) 0 var(--spacing-lg)",
-        }}
-      >
-        {t("auth.logout.hint")}
-      </p>
-      <LogoutButton />
-    </section>
+    <Card>
+      <CardHeader title={t("auth.logout.title")} icon={<LogOut size={18} />} />
+      <CardBody className="flex flex-col gap-4">
+        <BackButton onBack={onBack} />
+        <p className="m-0 text-sm text-ink-mute">{t("auth.logout.hint")}</p>
+        <LogoutButton />
+      </CardBody>
+    </Card>
   );
 }
 
 // ─── Menu list ────────────────────────────────────────────────────────────────
 
-const MENU_ITEMS: Array<{ key: Section; icon: string; labelKey: string }> = [
-  { key: "profile",  icon: "👤", labelKey: "settings.profile.title" },
-  { key: "password", icon: "🔑", labelKey: "settings.password.title" },
-  { key: "support",  icon: "💬", labelKey: "support.title" },
-  { key: "logout",   icon: "🚪", labelKey: "auth.logout.title" },
+const MENU_ITEMS: Array<{ key: Section; icon: ReactNode; labelKey: string; danger?: boolean }> = [
+  { key: "profile", icon: <UserRound size={18} />, labelKey: "settings.profile.title" },
+  { key: "password", icon: <KeyRound size={18} />, labelKey: "settings.password.title" },
+  { key: "support", icon: <LifeBuoy size={18} />, labelKey: "support.title" },
+  { key: "logout", icon: <LogOut size={18} />, labelKey: "auth.logout.title", danger: true },
 ];
 
 function SettingsMenu({ onSelect }: { onSelect: (s: Section) => void }): React.ReactElement {
@@ -318,56 +295,51 @@ function SettingsMenu({ onSelect }: { onSelect: (s: Section) => void }): React.R
   const { profile } = useAuthStore();
 
   return (
-    <div>
+    <div className="flex flex-col gap-4">
       {/* User info header */}
       {profile !== null && (
-        <div
-          style={{
-            padding: "var(--spacing-xl)",
-            marginBottom: "var(--spacing-lg)",
-            background: "var(--color-canvas-soft)",
-            borderRadius: "var(--rounded-lg)",
-            border: "1px solid var(--color-hairline)",
-          }}
-        >
-          <p style={{ margin: 0, fontSize: "18px", fontVariationSettings: '"wght" 600' }}>
-            {profile.name !== "" ? profile.name : t("settings.profile.namePlaceholder")}
-          </p>
-          <p style={{ margin: "4px 0 0", fontSize: "13px", color: "var(--color-ink-mute)" }}>
-            {profile.phone}
-          </p>
-        </div>
+        <Card className="bg-canvas-soft">
+          <CardBody className="flex items-center gap-4">
+            <span className="grid size-12 shrink-0 place-items-center rounded-full bg-primary text-on-primary">
+              <UserRound size={22} />
+            </span>
+            <div className="min-w-0">
+              <p className="wt-540 m-0 truncate text-base text-ink">
+                {profile.name !== "" ? profile.name : t("settings.profile.namePlaceholder")}
+              </p>
+              <p className="m-0 truncate text-[13px] text-ink-mute">{profile.phone}</p>
+            </div>
+          </CardBody>
+        </Card>
       )}
 
       {/* Menu items */}
-      <div style={{ display: "flex", flexDirection: "column", gap: "var(--spacing-sm)" }}>
+      <Card className="divide-y divide-hairline overflow-hidden">
         {MENU_ITEMS.map((item) => (
           <button
             key={item.key}
             type="button"
             onClick={() => onSelect(item.key)}
-            style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-              width: "100%",
-              padding: "var(--spacing-lg) var(--spacing-xl)",
-              background: "var(--color-canvas)",
-              border: "1px solid var(--color-hairline)",
-              borderRadius: "var(--rounded-lg)",
-              cursor: "pointer",
-              textAlign: "left",
-              color: item.key === "logout" ? "#b3261e" : "var(--color-ink)",
-            }}
+            className={`flex w-full cursor-pointer items-center justify-between gap-3 px-5 py-4 text-left transition-colors hover:bg-canvas-soft ${
+              item.danger === true ? "text-danger" : "text-ink"
+            }`}
           >
-            <span style={{ display: "flex", alignItems: "center", gap: "var(--spacing-md)", fontSize: "15px", fontVariationSettings: '"wght" 500' }}>
-              <span style={{ fontSize: "20px" }}>{item.icon}</span>
+            <span className="flex items-center gap-3 text-sm wt-460">
+              <span
+                className={`grid size-9 place-items-center rounded-lg ${
+                  item.danger === true
+                    ? "bg-danger-soft text-danger"
+                    : "bg-canvas-soft text-ink-mute"
+                }`}
+              >
+                {item.icon}
+              </span>
               {t(item.labelKey)}
             </span>
-            <span style={{ fontSize: "18px", color: "var(--color-ink-faint)" }}>›</span>
+            <ChevronRight size={18} className="text-ink-faint" />
           </button>
         ))}
-      </div>
+      </Card>
     </div>
   );
 }
@@ -387,30 +359,16 @@ export default function SettingsPage(): React.ReactElement {
   }
 
   return (
-    <main
-      style={{
-        padding: "var(--spacing-xl)",
-        maxWidth: "600px",
-        margin: "0 auto",
-        paddingBottom: "96px",
-      }}
-    >
-      <h1
-        style={{
-          fontSize: "28px",
-          fontVariationSettings: '"wght" 540',
-          margin: "0 0 var(--spacing-xl)",
-          display: activeSection !== null ? "none" : "block",
-        }}
-      >
-        {t("settings.metaTitle")}
-      </h1>
+    <div className="mx-auto flex max-w-2xl flex-col gap-4">
+      {activeSection === null && (
+        <PageHeader title={t("settings.metaTitle")} />
+      )}
 
       {activeSection === null && <SettingsMenu onSelect={setActiveSection} />}
-      {activeSection === "profile"  && <ProfileSection onBack={goBack} />}
+      {activeSection === "profile" && <ProfileSection onBack={goBack} />}
       {activeSection === "password" && <PasswordSection onBack={goBack} />}
-      {activeSection === "support"  && <SupportWrapper onBack={goBack} />}
-      {activeSection === "logout"   && <LogoutSectionView onBack={goBack} />}
-    </main>
+      {activeSection === "support" && <SupportWrapper onBack={goBack} />}
+      {activeSection === "logout" && <LogoutSectionView onBack={goBack} />}
+    </div>
   );
 }

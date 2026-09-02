@@ -1,6 +1,7 @@
 // apps/web/src/hooks/useTasks.ts
 // Task list/detail data hooks — queries `tasks` (publicly readable) and the
 // user's own `submissions` (RLS own-row) to annotate each task's state.
+// List is server-side paginated via supabase .range() + count.
 import { useCallback, useEffect, useState } from "react";
 import type { Session } from "@supabase/supabase-js";
 import { supabase } from "@/lib/supabase";
@@ -19,14 +20,24 @@ function isTaskAvailable(task: Task): boolean {
   );
 }
 
-/** Loads all active, non-expired tasks annotated with the user's submission state. */
-export function useTasks(session: Session | null): {
+/**
+ * Loads one page of active, non-expired tasks annotated with the user's
+ * submission state. Availability (max_completions) is still filtered
+ * client-side, so a page can render slightly fewer items than pageSize.
+ */
+export function useTasks(
+  session: Session | null,
+  page = 1,
+  pageSize = 12,
+): {
   tasks: TaskWithStatus[];
+  total: number;
   isLoading: boolean;
   error: string | null;
   reload: () => void;
 } {
   const [tasks, setTasks] = useState<TaskWithStatus[]>([]);
+  const [total, setTotal] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [tick, setTick] = useState(0);
@@ -34,31 +45,39 @@ export function useTasks(session: Session | null): {
   const reload = useCallback((): void => setTick((n) => n + 1), []);
 
   useEffect(() => {
-    const controller = new AbortController();
     void (async () => {
       setIsLoading(true);
       setError(null);
-      const { data: taskRows, error: taskError } = await supabase
-        .from("tasks")
-        .select("*")
-        .eq("status", "active")
-        .gt("expires_at", new Date().toISOString())
-        .order("created_at", { ascending: false })
-        ;
-      if (taskError !== null) {
+      const from = (page - 1) * pageSize;
+      const to = from + pageSize - 1;
+      const [taskRes, countRes] = await Promise.all([
+        supabase
+          .from("tasks")
+          .select("*")
+          .eq("status", "active")
+          .gt("expires_at", new Date().toISOString())
+          .order("created_at", { ascending: false })
+          .range(from, to),
+        supabase
+          .from("tasks")
+          .select("*", { count: "exact", head: true })
+          .eq("status", "active")
+          .gt("expires_at", new Date().toISOString()),
+      ]);
+      if (taskRes.error !== null || countRes.error !== null) {
         setError("load_failed");
         setIsLoading(false);
         return;
       }
-      const available = ((taskRows ?? []) as Task[]).filter(isTaskAvailable);
+      setTotal(countRes.count ?? 0);
+      const available = ((taskRes.data ?? []) as Task[]).filter(isTaskAvailable);
 
       let submissionRows: Submission[] = [];
       if (session !== null) {
         const { data: subs } = await supabase
           .from("submissions")
           .select("*")
-          .eq("user_id", session.user.id)
-          ;
+          .eq("user_id", session.user.id);
         submissionRows = (subs ?? []) as Submission[];
       }
       const byTaskId = new Map(submissionRows.map((s) => [s.task_id, s]));
@@ -66,10 +85,9 @@ export function useTasks(session: Session | null): {
       setTasks(available.map((task) => ({ task, submission: byTaskId.get(task.id) ?? null })));
       setIsLoading(false);
     })();
-    return () => controller.abort();
-  }, [session, tick]);
+  }, [session, tick, page, pageSize]);
 
-  return { tasks, isLoading, error, reload };
+  return { tasks, total, isLoading, error, reload };
 }
 
 /** Loads one task (any active status) + the user's submission for it. */
@@ -87,7 +105,6 @@ export function useTaskDetail(
       setIsLoading(false);
       return;
     }
-    const controller = new AbortController();
     void (async () => {
       setIsLoading(true);
       setError(null);
@@ -95,8 +112,7 @@ export function useTaskDetail(
         .from("tasks")
         .select("*")
         .eq("id", taskId)
-        .maybeSingle()
-        ;
+        .maybeSingle();
       if (taskError !== null || task === null) {
         setError("not_found");
         setIsLoading(false);
@@ -115,14 +131,12 @@ export function useTaskDetail(
           .select("*")
           .eq("task_id", taskId)
           .eq("user_id", session.user.id)
-          .maybeSingle()
-          ;
+          .maybeSingle();
         submission = (sub ?? null) as Submission | null;
       }
       setEntry({ task: t, submission });
       setIsLoading(false);
     })();
-    return () => controller.abort();
   }, [taskId, session]);
 
   return { entry, isLoading, error };

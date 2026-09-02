@@ -85,7 +85,9 @@
     "email": "Email",
     "back": "Back",
     "cancel": "Cancel",
-    "retry": "আবার চেষ্টা করুন"
+    "retry": "আবার চেষ্টা করুন",
+    "close": "বন্ধ করুন",
+    "openMenu": "মেনু খুলুন"
   },
   "landing": {
     "meta": {
@@ -206,7 +208,12 @@
       "p2p": "P2P",
       "wallet": "Wallet",
       "history": "History",
-      "settings": "Settings"
+      "settings": "Settings",
+      "title": "অ্যাকাউন্ট"
+    },
+    "notice": {
+      "title": "নতুন নোটিশ",
+      "confirm": "বুঝেছি"
     }
   },
   "task": {
@@ -239,7 +246,9 @@
       "uploading": "Uploading…",
       "submitted": "Submitted! It is now pending review.",
       "rejectionReason": "Reason",
-      "screenshotRequired": "এই টাস্ক জমা দিতে স্ক্রিনশট আপলোড করতে হবে।"
+      "screenshotRequired": "এই টাস্ক জমা দিতে স্ক্রিনশট আপলোড করতে হবে।",
+      "chooseFile": "স্ক্রিনশট বাছুন",
+      "viewScreenshot": "স্ক্রিনশট দেখুন"
     },
     "error": {
       "loadFailed": "Could not load tasks. Please try again.",
@@ -281,13 +290,23 @@
       "amount": "Amount (BDT)",
       "account": "Account number",
       "submit": "Request withdrawal",
-      "success": "Withdrawal request submitted! It is now pending review."
+      "success": "Withdrawal request submitted! It is now pending review.",
+      "confirmTitle": "উত্তোলনের অনুরোধ নিশ্চিত করুন",
+      "confirmMessage": "{{provider}}-এর মাধ্যমে ৳{{amount}} উত্তোলনের অনুরোধ করবেন? এটি ফেরানো যাবে না।"
     },
     "error": {
       "loadFailed": "Could not load your wallet. Please try again.",
       "belowMin": "Minimum withdrawal amount is ৳{{min}}.",
       "overBalance": "Amount exceeds your verified balance."
-    }
+    },
+    "insights": {
+      "cardTitle": "আয় (শেষ ১৪ দিন)",
+      "title": "শেষ ১৪ দিনের আয়",
+      "series": "আয়",
+      "empty": "এখনো কোনো অনুমোদিত আয় নেই — চার্ট দেখতে একটি টাস্ক সম্পন্ন করুন।"
+    },
+    "historyEmpty": "এখনো কোনো উত্তোলন নেই",
+    "historyEmptyHint": "উত্তোলনের অনুরোধ করলে সেগুলো এখানে দেখতে পাবেন।"
   },
   "p2p": {
     "meta": {
@@ -312,7 +331,14 @@
       "banned": "This transfer is not allowed (account suspended).",
       "rateLimited": "Too many attempts. Please try again later.",
       "generic": "Transfer failed. Please try again."
-    }
+    },
+    "step": {
+      "recipient": "প্রাপক",
+      "amount": "পরিমাণ",
+      "done": "সম্পন্ন"
+    },
+    "confirmTitle": "ট্রান্সফার নিশ্চিত করুন",
+    "confirmMessage": "{{name}}-কে ৳{{amount}} পাঠাবেন? এটি ফেরানো যাবে না।"
   },
   "referral": {
     "title": "Refer & earn",
@@ -365,6 +391,12 @@
     "empty": "Nothing here yet.",
     "error": {
       "loadFailed": "Could not load history. Please try again."
+    },
+    "col": {
+      "entry": "এন্ট্রি",
+      "date": "তারিখ",
+      "status": "অবস্থা",
+      "amount": "পরিমাণ"
     }
   },
   "support": {
@@ -389,7 +421,8 @@
       "reply_failed": "Could not send the reply. Please try again.",
       "load_failed": "Could not load your tickets."
     },
-    "noticeLabel": "নোটিশ"
+    "noticeLabel": "নোটিশ",
+    "replySent": "রিপ্লাই পাঠানো হয়েছে"
   },
   "admin": {
     "nav": {

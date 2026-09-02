@@ -1,5 +1,6 @@
 // apps/web/src/hooks/useWallet.ts
-// Wallet data — own wallet row (RLS) + site_settings singleton + own withdrawals.
+// Wallet data — own wallet row (RLS) + site_settings singleton + own
+// withdrawals (server-side paginated via .range() + count).
 // Waits for an authenticated session before querying; each resource fails
 // independently so a wallet-row problem does not block settings or withdrawals.
 import { useCallback, useEffect, useState } from "react";
@@ -7,10 +8,14 @@ import { supabase } from "@/lib/supabase";
 import { useAuthStore } from "@/stores/authStore";
 import type { SiteSettings, Wallet, Withdrawal } from "@wa-marketing-bd/shared-types";
 
-export function useWallet(): {
+export function useWallet(
+  page = 1,
+  pageSize = 10,
+): {
   wallet: Wallet | null;
   settings: SiteSettings | null;
   withdrawals: Withdrawal[];
+  withdrawalsTotal: number;
   isLoading: boolean;
   error: string | null;
   reload: () => void;
@@ -19,6 +24,7 @@ export function useWallet(): {
   const [wallet, setWallet] = useState<Wallet | null>(null);
   const [settings, setSettings] = useState<SiteSettings | null>(null);
   const [withdrawals, setWithdrawals] = useState<Withdrawal[]>([]);
+  const [withdrawalsTotal, setWithdrawalsTotal] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [tick, setTick] = useState(0);
@@ -37,6 +43,8 @@ export function useWallet(): {
       setError(null);
 
       const userId = session.user.id;
+      const from = (page - 1) * pageSize;
+      const to = from + pageSize - 1;
 
       const [walletRes, settingsRes, withdrawalsRes] = await Promise.all([
         // Explicitly filter by user_id so RLS + explicit filter both apply;
@@ -45,10 +53,10 @@ export function useWallet(): {
         supabase.from("site_settings").select("*").eq("id", 1).maybeSingle(),
         supabase
           .from("withdrawals")
-          .select("*")
+          .select("*", { count: "exact" })
           .eq("user_id", userId)
           .order("requested_at", { ascending: false })
-          .limit(20),
+          .range(from, to),
       ]);
 
       // Log individual errors to console for easier debugging.
@@ -73,10 +81,10 @@ export function useWallet(): {
       setWallet((walletRes.data ?? null) as Wallet | null);
       setSettings((settingsRes.data ?? null) as SiteSettings | null);
       setWithdrawals((withdrawalsRes.data ?? []) as Withdrawal[]);
+      setWithdrawalsTotal(withdrawalsRes.count ?? 0);
       setIsLoading(false);
     })();
-  }, [session, tick]);
+  }, [session, tick, page, pageSize]);
 
-  return { wallet, settings, withdrawals, isLoading, error, reload };
+  return { wallet, settings, withdrawals, withdrawalsTotal, isLoading, error, reload };
 }
-
