@@ -519,6 +519,19 @@
       "noticeStatusInactive": "Inactive — hidden",
       "noticeSave": "Save notice",
       "noticeSaved": "Notice saved successfully!"
+    },
+    "screenshotSetting": {
+      "title": "Screenshot Requirement",
+      "description": "Controls whether users must upload a screenshot when submitting tasks.",
+      "modeLabel": "Screenshot upload mode",
+      "must": "Must — required for every submission",
+      "optional": "Optional — allowed but not required",
+      "disabled": "Disabled — upload UI hidden entirely",
+      "mustHint": "Users cannot submit a task without uploading a screenshot.",
+      "optionalHint": "Users may attach a screenshot, but it is never required.",
+      "disabledHint": "The screenshot upload field is removed from the task page.",
+      "save": "Save Screenshot Setting",
+      "saved": "Screenshot setting saved!"
     }
   }
 }

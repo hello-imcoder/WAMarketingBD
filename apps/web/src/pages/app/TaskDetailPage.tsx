@@ -2,9 +2,9 @@
 // Route: "/app/task/:taskId" — task detail + submit flow (§6.2).
 //  - Shows WhatsApp number, exact message, payout, deadline.
 //  - wa.me deep-link button opens https://wa.me/<number>?text=<url-encoded-message>.
-//  - Screenshot upload is optional by default; when site_settings.require_screenshot
-//    is true the submit button is disabled until a file is selected and the
-//    create-submission Edge Function rejects submissions without a screenshot.
+//  - Screenshot upload mode comes from site_settings.screenshot_mode:
+//    'must' (required to submit) · 'optional' (default) · 'disabled' (upload
+//    UI hidden entirely). create-submission enforces 'must' server-side.
 //  - Submission is created server-side by the create-submission Edge Function
 //    (approved decision (a)) — it captures IP and validates eligibility.
 //    FALLBACK: if the Edge Function is not deployed/unreachable (404/network),
@@ -23,6 +23,7 @@ import { supabase } from "@/lib/supabase";
 import { useAuthStore } from "@/stores/authStore";
 import { useTaskDetail } from "@/hooks/useTasks";
 import { taskSubmissionSchema } from "@/lib/validators";
+import type { ScreenshotMode } from "@wa-marketing-bd/shared-types";
 
 interface CreateSubmissionResponse {
   ok: true;
@@ -55,22 +56,23 @@ export default function TaskDetailPage(): React.ReactElement {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
-  const [requireScreenshot, setRequireScreenshot] = useState(false);
+  const [screenshotMode, setScreenshotMode] = useState<ScreenshotMode>("optional");
 
   useEffect(() => {
     applySeo({ title: t("task.detail.metaTitle"), description: t("task.detail.metaDescription") });
   }, [t]);
 
-  // Fetch global screenshot requirement setting once on mount.
+  // Fetch global screenshot mode setting once on mount.
   useEffect(() => {
     async function fetchScreenshotSetting(): Promise<void> {
       const { data } = await supabase
         .from("site_settings")
-        .select("require_screenshot")
+        .select("screenshot_mode")
         .eq("id", 1)
         .maybeSingle();
       if (data !== null && data !== undefined) {
-        setRequireScreenshot(data.require_screenshot ?? false);
+        const m = (data.screenshot_mode as ScreenshotMode | null) ?? "optional";
+        setScreenshotMode(m === "must" || m === "disabled" ? m : "optional");
       }
     }
     void fetchScreenshotSetting();
@@ -93,8 +95,8 @@ export default function TaskDetailPage(): React.ReactElement {
     if (entry === null || session === null || isSubmitting) return;
     setErrorMsg(null);
 
-    // Client-side enforcement of global screenshot requirement.
-    if (requireScreenshot && file === null) {
+    // Client-side enforcement: 'must' requires a file before submitting.
+    if (screenshotMode === "must" && file === null) {
       setErrorMsg(t("task.error.screenshotRequired"));
       return;
     }
@@ -209,7 +211,7 @@ export default function TaskDetailPage(): React.ReactElement {
     isSubmitting={isSubmitting}
     errorMsg={errorMsg}
     success={success}
-    requireScreenshot={requireScreenshot}
+    screenshotMode={screenshotMode}
     onOpenWhatsApp={openWhatsApp}
     onFileChange={onFileChange}
     onSubmit={() => void handleSubmit()}
@@ -227,7 +229,7 @@ interface BodyProps {
   isSubmitting: boolean;
   errorMsg: string | null;
   success: boolean;
-  requireScreenshot: boolean;
+  screenshotMode: ScreenshotMode;
   onOpenWhatsApp: (number: string, message: string) => void;
   onFileChange: (e: ChangeEvent<HTMLInputElement>) => void;
   onSubmit: () => void;
@@ -242,7 +244,7 @@ function TaskDetailBody({
   isSubmitting,
   errorMsg,
   success,
-  requireScreenshot,
+  screenshotMode,
   onOpenWhatsApp,
   onFileChange,
   onSubmit,
@@ -332,22 +334,28 @@ function TaskDetailBody({
           <h2 style={{ fontSize: "20px", fontVariationSettings: '"wght" 540', margin: "0 0 8px" }}>
             {t("task.detail.submitTitle")}
           </h2>
-          <p style={{ color: "var(--color-ink-mute)", fontSize: "14px", margin: "0 0 16px" }}>
-            {requireScreenshot
-              ? t("task.detail.screenshotRequired")
-              : t("task.detail.screenshotOptional")}
-          </p>
 
-          <input
-            type="file"
-            accept="image/*"
-            onChange={onFileChange}
-            style={{ marginBottom: "var(--spacing-lg)" }}
-          />
-          {file !== null && (
-            <p style={{ fontSize: "12px", color: "var(--color-ink-faint)", margin: "0 0 12px" }}>
-              {file.name}
-            </p>
+          {/* Screenshot upload — hidden entirely in 'disabled' mode */}
+          {screenshotMode !== "disabled" && (
+            <>
+              <p style={{ color: "var(--color-ink-mute)", fontSize: "14px", margin: "0 0 16px" }}>
+                {screenshotMode === "must"
+                  ? t("task.detail.screenshotRequired")
+                  : t("task.detail.screenshotOptional")}
+              </p>
+
+              <input
+                type="file"
+                accept="image/*"
+                onChange={onFileChange}
+                style={{ marginBottom: "var(--spacing-lg)" }}
+              />
+              {file !== null && (
+                <p style={{ fontSize: "12px", color: "var(--color-ink-faint)", margin: "0 0 12px" }}>
+                  {file.name}
+                </p>
+              )}
+            </>
           )}
 
           {errorMsg !== null && (
@@ -360,7 +368,7 @@ function TaskDetailBody({
             type="button"
             className="auth-submit-btn"
             onClick={onSubmit}
-            disabled={isSubmitting || isUploading || (requireScreenshot && file === null)}
+            disabled={isSubmitting || isUploading || (screenshotMode === "must" && file === null)}
           >
             {isUploading
               ? t("task.detail.uploading")

@@ -160,14 +160,18 @@ serve(async (req: Request): Promise<Response> => {
   }
   if (t.completion_count >= t.max_completions) return errorResponse("TASK_FULL", 409);
 
-  // 5.5. Screenshot requirement — check global site_settings toggle.
+  // 5.5. Screenshot mode — check global site_settings toggle.
+  //   'must'     → submissions without a screenshot are rejected
+  //   'optional' → screenshots accepted but never required (default)
+  //   'disabled' → treated as optional server-side; the client hides the
+  //                upload UI, and any screenshot fields are simply absent
   const { data: settings } = await admin
     .from("site_settings")
-    .select("require_screenshot")
+    .select("screenshot_mode")
     .eq("id", 1)
     .maybeSingle();
-  const screenshotRequired = (settings as { require_screenshot: boolean } | null)?.require_screenshot ?? false;
-  if (screenshotRequired && input.screenshotPublicId === null) {
+  const screenshotMode = (settings as { screenshot_mode: string } | null)?.screenshot_mode ?? "optional";
+  if (screenshotMode === "must" && input.screenshotPublicId === null) {
     return errorResponse("SCREENSHOT_REQUIRED", 400);
   }
 

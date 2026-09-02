@@ -135,6 +135,9 @@ export type SupportReply = {
   created_at: string;
 };
 
+// Screenshot requirement mode for task submissions (0023_screenshot_mode.sql).
+export type ScreenshotMode = "must" | "optional" | "disabled";
+
 // ── site_settings (0010_site_settings.sql) ────────────────────────────────────
 export type SiteSettings = {
   id: 1;                         // singleton — always 1
@@ -146,7 +149,8 @@ export type SiteSettings = {
   admin_notice_updated_at: string | null;
   support_notice_text: string | null;
   is_support_notice_active: boolean;
-  require_screenshot: boolean;
+  require_screenshot: boolean;   // legacy (0022) — derived from screenshot_mode
+  screenshot_mode: ScreenshotMode; // 'must' | 'optional' | 'disabled' (0023)
 };
 
 // ── rate_limit_counters (0011_rate_limit_counters.sql) ────────────────────────
