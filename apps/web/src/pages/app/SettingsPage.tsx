@@ -1,13 +1,8 @@
 // apps/web/src/pages/app/SettingsPage.tsx
 // Route: "/app/settings"
-// Profile section (Milestone 3): name, contact email, password change.
-// Support section (Milestone 10): stubbed — filled in at that milestone.
-//
-// Password change flow:
-//   1. Re-authenticate via signInWithPassword using the synthesized email + current password.
-//   2. If that succeeds, call supabase.auth.updateUser({ password: newPassword }).
-//   This is the practical workaround for Supabase lacking a "verify current password" API.
-//   Required for a financial app — prevents a hijacked session from silently changing credentials.
+// Shows a menu list of settings sections; clicking an item slides into that
+// section (with a Back button to return). Sections: Profile, Password,
+// Support, Logout.
 import { useState, type FormEvent } from "react";
 import { useTranslation } from "react-i18next";
 import { supabase } from "@/lib/supabase";
@@ -20,10 +15,31 @@ import {
 import { AuthInputField } from "@/components/auth/AuthInputField";
 import { LogoutButton } from "@/components/auth/LogoutButton";
 import { SupportSection } from "@/components/user/SupportSection";
+import { applySeo } from "@/lib/seo";
+import { useEffect } from "react";
+
+// ─── Types ────────────────────────────────────────────────────────────────────
+
+type Section = "profile" | "password" | "support" | "logout";
+
+// ─── Shared back-button style ─────────────────────────────────────────────────
+
+const backBtnStyle: React.CSSProperties = {
+  display: "inline-flex",
+  alignItems: "center",
+  gap: "6px",
+  background: "none",
+  border: "none",
+  padding: "0 0 var(--spacing-xl) 0",
+  fontSize: "15px",
+  color: "var(--color-ink-mute)",
+  cursor: "pointer",
+  fontVariationSettings: '"wght" 500',
+};
 
 // ─── Profile section ──────────────────────────────────────────────────────────
 
-function ProfileSection(): React.ReactElement {
+function ProfileSection({ onBack }: { onBack: () => void }): React.ReactElement {
   const { t } = useTranslation();
   const { session, profile, refreshProfile } = useAuthStore();
 
@@ -54,7 +70,6 @@ function ProfileSection(): React.ReactElement {
     try {
       const update: Record<string, string> = {};
       if (parsed.data.name !== undefined) update["name"] = parsed.data.name;
-      // Always send email field (even if empty string) to allow clearing it
       update["email"] = parsed.data.email ?? "";
 
       const { error: dbError } = await supabase
@@ -77,7 +92,10 @@ function ProfileSection(): React.ReactElement {
   }
 
   return (
-    <section className="settings-section">
+    <section className="settings-section" style={{ borderBottom: "none" }}>
+      <button type="button" style={backBtnStyle} onClick={onBack}>
+        ← {t("common.back")}
+      </button>
       <h2 className="settings-section-title">{t("settings.profile.title")}</h2>
 
       <form onSubmit={(e) => void handleSubmit(e)} noValidate>
@@ -140,7 +158,7 @@ function ProfileSection(): React.ReactElement {
 
 // ─── Password-change section ──────────────────────────────────────────────────
 
-function PasswordSection(): React.ReactElement {
+function PasswordSection({ onBack }: { onBack: () => void }): React.ReactElement {
   const { t } = useTranslation();
   const { profile } = useAuthStore();
 
@@ -165,8 +183,6 @@ function PasswordSection(): React.ReactElement {
 
     setIsSaving(true);
     try {
-      // Step 1: Re-authenticate to verify current password.
-      // Supabase has no "verify current password" API, so we re-sign-in as the workaround.
       const { error: reAuthError } = await supabase.auth.signInWithPassword({
         email: phoneToEmail(profile.phone),
         password: currentPassword,
@@ -177,7 +193,6 @@ function PasswordSection(): React.ReactElement {
         return;
       }
 
-      // Step 2: Current password verified — update to new password.
       const { error: updateError } = await supabase.auth.updateUser({
         password: newPassword,
       });
@@ -198,7 +213,10 @@ function PasswordSection(): React.ReactElement {
   }
 
   return (
-    <section className="settings-section">
+    <section className="settings-section" style={{ borderBottom: "none" }}>
+      <button type="button" style={backBtnStyle} onClick={onBack}>
+        ← {t("common.back")}
+      </button>
       <h2 className="settings-section-title">{t("settings.password.title")}</h2>
 
       <form onSubmit={(e) => void handleSubmit(e)} noValidate>
@@ -240,22 +258,36 @@ function PasswordSection(): React.ReactElement {
           className="auth-submit-btn"
           style={{ maxWidth: "220px" }}
         >
-          {isSaving
-            ? t("common.saving")
-            : t("settings.password.submitButton")}
+          {isSaving ? t("common.saving") : t("settings.password.submitButton")}
         </button>
       </form>
     </section>
   );
 }
 
-// ─── Sign-out section ─────────────────────────────────────────────────────────
+// ─── Support wrapper (with Back button) ───────────────────────────────────────
 
-function LogoutSection(): React.ReactElement {
+function SupportWrapper({ onBack }: { onBack: () => void }): React.ReactElement {
   const { t } = useTranslation();
-
   return (
-    <section className="settings-section">
+    <div>
+      <button type="button" style={backBtnStyle} onClick={onBack}>
+        ← {t("common.back")}
+      </button>
+      <SupportSection />
+    </div>
+  );
+}
+
+// ─── Logout section ──────────────────────────────────────────────────────────
+
+function LogoutSectionView({ onBack }: { onBack: () => void }): React.ReactElement {
+  const { t } = useTranslation();
+  return (
+    <section className="settings-section" style={{ borderBottom: "none" }}>
+      <button type="button" style={backBtnStyle} onClick={onBack}>
+        ← {t("common.back")}
+      </button>
       <h2 className="settings-section-title">{t("auth.logout.title")}</h2>
       <p
         style={{
@@ -272,21 +304,113 @@ function LogoutSection(): React.ReactElement {
   );
 }
 
+// ─── Menu list ────────────────────────────────────────────────────────────────
+
+const MENU_ITEMS: Array<{ key: Section; icon: string; labelKey: string }> = [
+  { key: "profile",  icon: "👤", labelKey: "settings.profile.title" },
+  { key: "password", icon: "🔑", labelKey: "settings.password.title" },
+  { key: "support",  icon: "💬", labelKey: "support.title" },
+  { key: "logout",   icon: "🚪", labelKey: "auth.logout.title" },
+];
+
+function SettingsMenu({ onSelect }: { onSelect: (s: Section) => void }): React.ReactElement {
+  const { t } = useTranslation();
+  const { profile } = useAuthStore();
+
+  return (
+    <div>
+      {/* User info header */}
+      {profile !== null && (
+        <div
+          style={{
+            padding: "var(--spacing-xl)",
+            marginBottom: "var(--spacing-lg)",
+            background: "var(--color-canvas-soft)",
+            borderRadius: "var(--rounded-lg)",
+            border: "1px solid var(--color-hairline)",
+          }}
+        >
+          <p style={{ margin: 0, fontSize: "18px", fontVariationSettings: '"wght" 600' }}>
+            {profile.name !== "" ? profile.name : t("settings.profile.namePlaceholder")}
+          </p>
+          <p style={{ margin: "4px 0 0", fontSize: "13px", color: "var(--color-ink-mute)" }}>
+            {profile.phone}
+          </p>
+        </div>
+      )}
+
+      {/* Menu items */}
+      <div style={{ display: "flex", flexDirection: "column", gap: "var(--spacing-sm)" }}>
+        {MENU_ITEMS.map((item) => (
+          <button
+            key={item.key}
+            type="button"
+            onClick={() => onSelect(item.key)}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              width: "100%",
+              padding: "var(--spacing-lg) var(--spacing-xl)",
+              background: "var(--color-canvas)",
+              border: "1px solid var(--color-hairline)",
+              borderRadius: "var(--rounded-lg)",
+              cursor: "pointer",
+              textAlign: "left",
+              color: item.key === "logout" ? "#b3261e" : "var(--color-ink)",
+            }}
+          >
+            <span style={{ display: "flex", alignItems: "center", gap: "var(--spacing-md)", fontSize: "15px", fontVariationSettings: '"wght" 500' }}>
+              <span style={{ fontSize: "20px" }}>{item.icon}</span>
+              {t(item.labelKey)}
+            </span>
+            <span style={{ fontSize: "18px", color: "var(--color-ink-faint)" }}>›</span>
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default function SettingsPage(): React.ReactElement {
+  const { t } = useTranslation();
+  const [activeSection, setActiveSection] = useState<Section | null>(null);
+
+  useEffect(() => {
+    applySeo({ title: t("settings.metaTitle"), description: "" });
+  }, [t]);
+
+  function goBack(): void {
+    setActiveSection(null);
+  }
+
   return (
     <main
       style={{
         padding: "var(--spacing-xl)",
         maxWidth: "600px",
         margin: "0 auto",
+        paddingBottom: "96px",
       }}
     >
-      <ProfileSection />
-      <PasswordSection />
-      <SupportSection />
-      <LogoutSection />
+      <h1
+        style={{
+          fontSize: "28px",
+          fontVariationSettings: '"wght" 540',
+          margin: "0 0 var(--spacing-xl)",
+          display: activeSection !== null ? "none" : "block",
+        }}
+      >
+        {t("settings.metaTitle")}
+      </h1>
+
+      {activeSection === null && <SettingsMenu onSelect={setActiveSection} />}
+      {activeSection === "profile"  && <ProfileSection onBack={goBack} />}
+      {activeSection === "password" && <PasswordSection onBack={goBack} />}
+      {activeSection === "support"  && <SupportWrapper onBack={goBack} />}
+      {activeSection === "logout"   && <LogoutSectionView onBack={goBack} />}
     </main>
   );
 }

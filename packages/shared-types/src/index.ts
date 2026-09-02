@@ -144,6 +144,9 @@ export type SiteSettings = {
   admin_notice_text: string | null;
   is_admin_notice_active: boolean;
   admin_notice_updated_at: string | null;
+  support_notice_text: string | null;
+  is_support_notice_active: boolean;
+  require_screenshot: boolean;
 };
 
 // ── rate_limit_counters (0011_rate_limit_counters.sql) ────────────────────────

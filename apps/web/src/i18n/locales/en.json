@@ -73,7 +73,8 @@
       "error": {
         "wrongCurrentPassword": "Current password is incorrect"
       }
-    }
+    },
+    "metaTitle": "Settings"
   },
   "common": {
     "loading": "Loading…",
@@ -236,7 +237,8 @@
       "submitButton": "Submit task",
       "uploading": "Uploading…",
       "submitted": "Submitted! It is now pending review.",
-      "rejectionReason": "Reason"
+      "rejectionReason": "Reason",
+      "screenshotRequired": "A screenshot is required to submit this task."
     },
     "error": {
       "loadFailed": "Could not load tasks. Please try again.",
@@ -247,7 +249,8 @@
       "taskFull": "This task has reached its completion limit.",
       "alreadySubmitted": "You have already submitted this task.",
       "banned": "Your account is suspended.",
-      "generic": "Something went wrong. Please try again."
+      "generic": "Something went wrong. Please try again.",
+      "screenshotRequired": "Please upload a screenshot before submitting."
     }
   },
   "wallet": {
@@ -384,7 +387,8 @@
       "submit_failed": "Could not submit the ticket. Please try again.",
       "reply_failed": "Could not send the reply. Please try again.",
       "load_failed": "Could not load your tickets."
-    }
+    },
+    "noticeLabel": "Notice"
   },
   "admin": {
     "nav": {
@@ -401,7 +405,10 @@
       "submissionsDesc": "Review pending task submissions",
       "withdrawalsDesc": "Process withdrawal requests",
       "usersDesc": "Verify, suspend or ban users",
-      "supportDesc": "Respond to support tickets"
+      "supportDesc": "Respond to support tickets",
+      "statActiveTasks": "Active Tasks",
+      "statTotalCompleted": "Total Completed",
+      "statPendingReview": "Pending Review"
     },
     "error": {
       "load_failed": "Could not load data.",
@@ -426,7 +433,10 @@
       "pause": "Pause",
       "resume": "Resume",
       "edit": "Edit",
-      "empty": "No tasks yet."
+      "empty": "No tasks yet.",
+      "whatsappNumbers": "WhatsApp numbers (one per line or comma-separated)",
+      "whatsappNumbersPlaceholder": "8801XXXXXXXXX\n8801YYYYYYYYY",
+      "completionCount": "{{count}}/{{max}} completions"
     },
     "submissions": {
       "pendingTitle": "Pending submissions",
@@ -499,7 +509,16 @@
       "sendReply": "Send reply",
       "closeTicket": "Close ticket",
       "reopenTicket": "Reopen",
-      "empty": "No tickets yet."
+      "empty": "No tickets yet.",
+      "noticeTitle": "Support Page Notice",
+      "noticeDescription": "This message appears as a banner at the top of the user Support page when active.",
+      "noticeText": "Notice message",
+      "noticePlaceholder": "Write a notice for users visiting the support page…",
+      "noticeStatus": "Status",
+      "noticeStatusActive": "Active — visible to users",
+      "noticeStatusInactive": "Inactive — hidden",
+      "noticeSave": "Save notice",
+      "noticeSaved": "Notice saved successfully!"
     }
   }
 }

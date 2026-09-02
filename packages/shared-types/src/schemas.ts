@@ -163,8 +163,20 @@ export const adminUserActionSchema = z
 export type AdminUserActionInput = z.infer<typeof adminUserActionSchema>;
 
 // Admin task create/update (§7.1 — direct RLS-scoped writes via is_su_admin()).
+// whatsappNumbers accepts one or many numbers separated by commas, semicolons,
+// or newlines; each individual number must be 7–15 digits (no leading +/spaces).
+// useAdminTasks.createTask() splits the string and inserts one task row per number.
 export const adminTaskCreateSchema = z.object({
-  whatsappNumber: z.string().regex(/^[0-9]{7,15}$/, "WhatsApp number must be 7–15 digits"),
+  whatsappNumbers: z
+    .string()
+    .min(1, "At least one WhatsApp number is required")
+    .refine(
+      (raw) => {
+        const nums = raw.split(/[\n,;]+/).map((n) => n.trim()).filter((n) => n.length > 0);
+        return nums.length > 0 && nums.every((n) => /^[0-9]{7,15}$/.test(n));
+      },
+      "Each number must be 7–15 digits (no spaces, no +). Separate multiple numbers with commas or newlines.",
+    ),
   message: z.string().min(1, "Message is required").max(2000, "Message too long"),
   payoutAmount: z.number().int("Payout must be a whole number (BDT taka)").positive("Payout must be positive"),
   maxCompletions: z.number().int().positive("Max completions must be positive"),

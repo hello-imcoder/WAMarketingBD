@@ -16,7 +16,7 @@
 // Request: POST { taskId, screenshotPublicId|null, screenshotHash|null,
 //                 waLinkClicked, deviceFingerprint|null }
 // Success:  200 { ok: true, submissionId }
-// Errors:   400 INVALID_INPUT · 401 UNAUTHORIZED · 403 BANNED ·
+// Errors:   400 INVALID_INPUT | SCREENSHOT_REQUIRED · 401 UNAUTHORIZED · 403 BANNED ·
 //           404 TASK_NOT_FOUND · 409 TASK_EXPIRED | TASK_FULL | ALREADY_SUBMITTED ·
 //           429 RATE_LIMITED · 500 SUBMISSION_FAILED
 
@@ -159,6 +159,17 @@ serve(async (req: Request): Promise<Response> => {
     return errorResponse("TASK_EXPIRED", 409);
   }
   if (t.completion_count >= t.max_completions) return errorResponse("TASK_FULL", 409);
+
+  // 5.5. Screenshot requirement — check global site_settings toggle.
+  const { data: settings } = await admin
+    .from("site_settings")
+    .select("require_screenshot")
+    .eq("id", 1)
+    .maybeSingle();
+  const screenshotRequired = (settings as { require_screenshot: boolean } | null)?.require_screenshot ?? false;
+  if (screenshotRequired && input.screenshotPublicId === null) {
+    return errorResponse("SCREENSHOT_REQUIRED", 400);
+  }
 
   // 6. Duplicate submissions (mirrors submissions_user_task_unique).
   const { data: existing } = await admin

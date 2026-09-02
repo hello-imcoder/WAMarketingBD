@@ -2,10 +2,14 @@
 // Route: "/rexio-admin/support" — ticket list + thread view + reply +
 // status change (open/replied/closed). Direct RLS-scoped writes:
 // support_replies admin INSERT (is_admin_reply=true) + tickets admin UPDATE.
-import { useState } from "react";
+// Also contains a "Support Notice" editor that writes to site_settings
+// (support_notice_text / is_support_notice_active), shown to users on the
+// Support tab in SupportSection.tsx.
+import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { useAuthStore } from "@/stores/authStore";
 import { useAdminSupport } from "@/hooks/useAdminSupport";
+import { supabase } from "@/lib/supabase";
 import type { SupportReply } from "@wa-marketing-bd/shared-types";
 
 export default function AdminSupportPage(): React.ReactElement {
@@ -16,6 +20,38 @@ export default function AdminSupportPage(): React.ReactElement {
   const [replies, setReplies] = useState<SupportReply[]>([]);
   const [draft, setDraft] = useState("");
   const [actionError, setActionError] = useState<string | null>(null);
+
+  // ── Support Notice editor state ───────────────────────────────────────────
+  const [noticeText, setNoticeText] = useState("");
+  const [noticeActive, setNoticeActive] = useState(false);
+  const [noticeLoading, setNoticeLoading] = useState(true);
+  const [noticeSaving, setNoticeSaving] = useState(false);
+
+  useEffect(() => {
+    async function fetchNotice(): Promise<void> {
+      const { data } = await supabase
+        .from("site_settings")
+        .select("support_notice_text, is_support_notice_active")
+        .eq("id", 1)
+        .maybeSingle();
+      if (data !== null && data !== undefined) {
+        setNoticeText(data.support_notice_text ?? "");
+        setNoticeActive(data.is_support_notice_active ?? false);
+      }
+      setNoticeLoading(false);
+    }
+    void fetchNotice();
+  }, []);
+
+  async function handleNoticeSave(): Promise<void> {
+    setNoticeSaving(true);
+    await supabase
+      .from("site_settings")
+      .update({ support_notice_text: noticeText, is_support_notice_active: noticeActive })
+      .eq("id", 1);
+    setNoticeSaving(false);
+    alert(t("admin.support.noticeSaved"));
+  }
 
   async function openThread(ticketId: string): Promise<void> {
     setOpenTicketId(ticketId);
@@ -41,10 +77,103 @@ export default function AdminSupportPage(): React.ReactElement {
   }
 
   return (
-    <div style={{ display: "grid", gap: "var(--spacing-lg)" }}>
+    <div style={{ display: "grid", gap: "var(--spacing-xl)" }}>
       <h1 style={{ fontSize: "22px", fontVariationSettings: '"wght" 540', margin: 0 }}>
         {t("admin.support.title")}
       </h1>
+
+      {/* ── Support Notice Editor ───────────────────────────────────────── */}
+      <div
+        style={{
+          border: "1px solid var(--color-hairline)",
+          borderRadius: "var(--rounded-lg)",
+          padding: "var(--spacing-xl)",
+          background: "var(--color-canvas)",
+        }}
+      >
+        <h2 style={{ fontSize: "16px", margin: "0 0 var(--spacing-sm)", fontVariationSettings: '"wght" 600' }}>
+          📢 {t("admin.support.noticeTitle")}
+        </h2>
+        <p style={{ color: "var(--color-ink-mute)", fontSize: "13px", margin: "0 0 var(--spacing-md)" }}>
+          {t("admin.support.noticeDescription")}
+        </p>
+        {noticeLoading ? (
+          <p role="status">{t("common.loading")}</p>
+        ) : (
+          <>
+            <div style={{ marginBottom: "var(--spacing-md)" }}>
+              <label
+                htmlFor="support-notice-text"
+                style={{ display: "block", fontSize: "13px", fontVariationSettings: '"wght" 500', marginBottom: "4px" }}
+              >
+                {t("admin.support.noticeText")}
+              </label>
+              <textarea
+                id="support-notice-text"
+                rows={4}
+                value={noticeText}
+                onChange={(e) => setNoticeText(e.target.value)}
+                placeholder={t("admin.support.noticePlaceholder")}
+                style={{
+                  width: "100%",
+                  border: "1px solid var(--color-hairline)",
+                  borderRadius: "var(--rounded-sm)",
+                  padding: "var(--spacing-sm)",
+                  fontSize: "14px",
+                  resize: "vertical",
+                  background: "transparent",
+                  color: "var(--color-ink)",
+                  boxSizing: "border-box",
+                }}
+              />
+            </div>
+            <div style={{ marginBottom: "var(--spacing-lg)" }}>
+              <label
+                htmlFor="support-notice-status"
+                style={{ display: "block", fontSize: "13px", fontVariationSettings: '"wght" 500', marginBottom: "4px" }}
+              >
+                {t("admin.support.noticeStatus")}
+              </label>
+              <select
+                id="support-notice-status"
+                value={noticeActive ? "active" : "inactive"}
+                onChange={(e) => setNoticeActive(e.target.value === "active")}
+                style={{
+                  width: "100%",
+                  border: "1px solid var(--color-hairline)",
+                  borderRadius: "var(--rounded-sm)",
+                  padding: "var(--spacing-sm)",
+                  fontSize: "14px",
+                  background: "transparent",
+                  color: "var(--color-ink)",
+                }}
+              >
+                <option value="active">✅ {t("admin.support.noticeStatusActive")}</option>
+                <option value="inactive">❌ {t("admin.support.noticeStatusInactive")}</option>
+              </select>
+            </div>
+            <button
+              type="button"
+              onClick={() => void handleNoticeSave()}
+              disabled={noticeSaving}
+              style={{
+                background: "var(--color-primary)",
+                color: "var(--color-on-primary)",
+                border: "none",
+                borderRadius: "var(--rounded-md)",
+                padding: "10px 20px",
+                fontSize: "14px",
+                fontVariationSettings: '"wght" 600',
+                cursor: noticeSaving ? "not-allowed" : "pointer",
+              }}
+            >
+              {noticeSaving ? t("common.saving") : t("admin.support.noticeSave")}
+            </button>
+          </>
+        )}
+      </div>
+
+      {/* ── Ticket list ─────────────────────────────────────────────────── */}
       {isLoading && <p role="status">{t("common.loading")}</p>}
       {error !== null && <p role="alert">{t("admin.error.load_failed")}</p>}
       {actionError !== null && <p role="alert" style={{ color: "#b3261e" }}>{t(`admin.error.${actionError}`)}</p>}

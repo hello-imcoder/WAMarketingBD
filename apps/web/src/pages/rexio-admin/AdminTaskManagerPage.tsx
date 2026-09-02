@@ -36,7 +36,7 @@ export default function AdminTaskManagerPage(): React.ReactElement {
   const [formError, setFormError] = useState<string | null>(null);
   const [editing, setEditing] = useState<Task | null>(null);
   const [form, setForm] = useState({
-    whatsappNumber: "",
+    whatsappNumbers: "",
     message: "",
     payoutAmount: "",
     maxCompletions: "",
@@ -44,7 +44,7 @@ export default function AdminTaskManagerPage(): React.ReactElement {
   });
 
   function resetForm(): void {
-    setForm({ whatsappNumber: "", message: "", payoutAmount: "", maxCompletions: "", expiresAt: "" });
+    setForm({ whatsappNumbers: "", message: "", payoutAmount: "", maxCompletions: "", expiresAt: "" });
     setEditing(null);
     setFormError(null);
   }
@@ -52,7 +52,7 @@ export default function AdminTaskManagerPage(): React.ReactElement {
   function startEdit(task: Task): void {
     setEditing(task);
     setForm({
-      whatsappNumber: task.whatsapp_number,
+      whatsappNumbers: task.whatsapp_number,
       message: task.message,
       payoutAmount: String(task.payout_amount),
       maxCompletions: String(task.max_completions),
@@ -66,7 +66,7 @@ export default function AdminTaskManagerPage(): React.ReactElement {
     const expiresIso = new Date(form.expiresAt).toISOString();
     if (editing === null) {
       const parsed = adminTaskCreateSchema.safeParse({
-        whatsappNumber: form.whatsappNumber,
+        whatsappNumbers: form.whatsappNumbers,
         message: form.message,
         payoutAmount: Number(form.payoutAmount),
         maxCompletions: Number(form.maxCompletions),
@@ -81,7 +81,7 @@ export default function AdminTaskManagerPage(): React.ReactElement {
       else resetForm();
     } else {
       const err = await updateTask(editing.id, {
-        whatsapp_number: form.whatsappNumber,
+        whatsapp_number: form.whatsappNumbers,
         message: form.message,
         payout_amount: Number(form.payoutAmount),
         max_completions: Number(form.maxCompletions),
@@ -100,9 +100,15 @@ export default function AdminTaskManagerPage(): React.ReactElement {
         </h1>
         <form onSubmit={(e) => void handleSubmit(e)} style={{ display: "grid", gap: "var(--spacing-md)", maxWidth: "520px" }}>
           <div>
-            <label htmlFor="wa-number" style={labelStyle}>{t("admin.tasks.whatsappNumber")}</label>
-            <input id="wa-number" style={inputStyle} value={form.whatsappNumber} inputMode="numeric"
-              onChange={(e) => setForm({ ...form, whatsappNumber: e.target.value })} placeholder="8801XXXXXXXXX" />
+            <label htmlFor="wa-number" style={labelStyle}>{t("admin.tasks.whatsappNumbers")}</label>
+            <textarea
+              id="wa-number"
+              rows={editing !== null ? 2 : 4}
+              style={{ ...inputStyle, minHeight: "64px", resize: "vertical" }}
+              value={form.whatsappNumbers}
+              onChange={(e) => setForm({ ...form, whatsappNumbers: e.target.value })}
+              placeholder={t("admin.tasks.whatsappNumbersPlaceholder")}
+            />
           </div>
           <div>
             <label htmlFor="wa-message" style={labelStyle}>{t("admin.tasks.message")}</label>
@@ -162,7 +168,7 @@ export default function AdminTaskManagerPage(): React.ReactElement {
                     {task.message.length > 80 ? `${task.message.slice(0, 80)}…` : task.message}
                   </p>
                   <p style={{ margin: "4px 0 0", fontSize: "12px", color: "var(--color-ink-faint)" }}>
-                    {task.completion_count}/{task.max_completions} · {new Date(task.expires_at).toLocaleString()}
+                    {t("admin.tasks.completionCount", { count: task.completion_count, max: task.max_completions })} · {new Date(task.expires_at).toLocaleString()}
                   </p>
                 </div>
                 <div style={{ display: "flex", gap: "var(--spacing-sm)", alignItems: "center" }}>

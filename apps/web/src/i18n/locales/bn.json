@@ -73,7 +73,8 @@
       "error": {
         "wrongCurrentPassword": "Current password is incorrect"
       }
-    }
+    },
+    "metaTitle": "সেটিংস"
   },
   "common": {
     "loading": "Loading…",
@@ -236,7 +237,8 @@
       "submitButton": "Submit task",
       "uploading": "Uploading…",
       "submitted": "Submitted! It is now pending review.",
-      "rejectionReason": "Reason"
+      "rejectionReason": "Reason",
+      "screenshotRequired": "এই টাস্ক জমা দিতে স্ক্রিনশট আপলোড করতে হবে।"
     },
     "error": {
       "loadFailed": "Could not load tasks. Please try again.",
@@ -247,7 +249,8 @@
       "taskFull": "This task has reached its completion limit.",
       "alreadySubmitted": "You have already submitted this task.",
       "banned": "Your account is suspended.",
-      "generic": "Something went wrong. Please try again."
+      "generic": "Something went wrong. Please try again.",
+      "screenshotRequired": "জমা দেওয়ার আগে অনুগ্রহ করে একটি স্ক্রিনশট আপলোড করুন।"
     }
   },
   "wallet": {
@@ -384,7 +387,8 @@
       "submit_failed": "Could not submit the ticket. Please try again.",
       "reply_failed": "Could not send the reply. Please try again.",
       "load_failed": "Could not load your tickets."
-    }
+    },
+    "noticeLabel": "নোটিশ"
   },
   "admin": {
     "nav": {
@@ -401,7 +405,10 @@
       "submissionsDesc": "Review pending task submissions",
       "withdrawalsDesc": "Process withdrawal requests",
       "usersDesc": "Verify, suspend or ban users",
-      "supportDesc": "Respond to support tickets"
+      "supportDesc": "Respond to support tickets",
+      "statActiveTasks": "সক্রিয় টাস্ক",
+      "statTotalCompleted": "মোট সম্পন্ন",
+      "statPendingReview": "পর্যালোচনা বাকি"
     },
     "error": {
       "load_failed": "Could not load data.",
@@ -426,7 +433,10 @@
       "pause": "Pause",
       "resume": "Resume",
       "edit": "Edit",
-      "empty": "No tasks yet."
+      "empty": "No tasks yet.",
+      "whatsappNumbers": "হোয়াটসঅ্যাপ নম্বর (প্রতি লাইনে একটা বা কমা দিয়ে)",
+      "whatsappNumbersPlaceholder": "8801XXXXXXXXX\n8801YYYYYYYYY",
+      "completionCount": "{{count}}/{{max}} সম্পন্ন"
     },
     "submissions": {
       "pendingTitle": "Pending submissions",
@@ -499,7 +509,16 @@
       "sendReply": "Send reply",
       "closeTicket": "Close ticket",
       "reopenTicket": "Reopen",
-      "empty": "No tickets yet."
+      "empty": "No tickets yet.",
+      "noticeTitle": "সাপোর্ট পেজ নোটিশ",
+      "noticeDescription": "এই বার্তাটি সক্রিয় থাকলে ইউজারের সাপোর্ট পেজের উপরে ব্যানার হিসেবে দেখাবে।",
+      "noticeText": "নোটিশ বার্তা",
+      "noticePlaceholder": "সাপোর্ট পেজে ইউজারদের জন্য নোটিশ লিখুন…",
+      "noticeStatus": "অবস্থা",
+      "noticeStatusActive": "সক্রিয় — ইউজারদের দেখা যাবে",
+      "noticeStatusInactive": "নিষ্ক্রিয় — লুকানো",
+      "noticeSave": "নোটিশ সংরক্ষণ করুন",
+      "noticeSaved": "নোটিশ সংরক্ষিত হয়েছে!"
     }
   }
 }

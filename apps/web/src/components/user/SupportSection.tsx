@@ -1,10 +1,14 @@
 // apps/web/src/components/user/SupportSection.tsx
 // Support section of Settings (§6.7) — open a ticket, list own tickets,
 // view a ticket thread with replies (admin responses come in Milestone 11).
-import { useState, type FormEvent } from "react";
+// Fetches support_notice_text from site_settings and shows it as a popup
+// modal (using NoticeModal) when is_support_notice_active is true.
+import { useState, useEffect, type FormEvent } from "react";
 import { useTranslation } from "react-i18next";
 import { useSupport } from "@/hooks/useSupport";
+import { supabase } from "@/lib/supabase";
 import { supportTicketSchema, supportReplySchema } from "@/lib/validators";
+import { NoticeModal } from "@/components/app/NoticeModal";
 import type { SupportReply, SupportTicket } from "@wa-marketing-bd/shared-types";
 
 const inputStyle: React.CSSProperties = {
@@ -30,6 +34,34 @@ export function SupportSection(): React.ReactElement {
   const [replies, setReplies] = useState<SupportReply[]>([]);
   const [replyText, setReplyText] = useState("");
   const [replyError, setReplyError] = useState<string | null>(null);
+
+  // ── Support notice from site_settings ──────────────────────────────────
+  const [supportNotice, setSupportNotice] = useState<string | null>(null);
+  const [showNoticeModal, setShowNoticeModal] = useState(false);
+
+  useEffect(() => {
+    let mounted = true;
+    async function fetchNotice(): Promise<void> {
+      const { data } = await supabase
+        .from("site_settings")
+        .select("support_notice_text, is_support_notice_active")
+        .eq("id", 1)
+        .maybeSingle();
+      if (
+        mounted &&
+        data !== null &&
+        data !== undefined &&
+        data.is_support_notice_active === true &&
+        typeof data.support_notice_text === "string" &&
+        data.support_notice_text.trim() !== ""
+      ) {
+        setSupportNotice(data.support_notice_text);
+        setShowNoticeModal(true);
+      }
+    }
+    void fetchNotice();
+    return () => { mounted = false; };
+  }, []);
 
   async function handleSubmit(e: FormEvent<HTMLFormElement>): Promise<void> {
     e.preventDefault();
@@ -79,6 +111,14 @@ export function SupportSection(): React.ReactElement {
   return (
     <section className="settings-section">
       <h2 className="settings-section-title">{t("support.title")}</h2>
+
+      {/* Admin support notice — popup modal */}
+      {supportNotice !== null && showNoticeModal && (
+        <NoticeModal
+          noticeText={supportNotice}
+          onDismiss={() => setShowNoticeModal(false)}
+        />
+      )}
 
       {openTicket !== null ? (
         <div>

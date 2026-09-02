@@ -2,7 +2,9 @@
 // Route: "/app/task/:taskId" — task detail + submit flow (§6.2).
 //  - Shows WhatsApp number, exact message, payout, deadline.
 //  - wa.me deep-link button opens https://wa.me/<number>?text=<url-encoded-message>.
-//  - Optional Cloudinary screenshot upload (unsigned preset).
+//  - Screenshot upload is optional by default; when site_settings.require_screenshot
+//    is true the submit button is disabled until a file is selected and the
+//    create-submission Edge Function rejects submissions without a screenshot.
 //  - Submission is created server-side by the create-submission Edge Function
 //    (approved decision (a)) — it captures IP and validates eligibility.
 //    FALLBACK: if the Edge Function is not deployed/unreachable (404/network),
@@ -33,6 +35,7 @@ const EDGE_ERROR_KEYS: Record<string, string> = {
   TASK_FULL: "taskFull",
   ALREADY_SUBMITTED: "alreadySubmitted",
   BANNED: "banned",
+  SCREENSHOT_REQUIRED: "screenshotRequired",
   UNAUTHORIZED: "generic",
   INVALID_INPUT: "generic",
   TASK_NOT_FOUND: "generic",
@@ -52,10 +55,26 @@ export default function TaskDetailPage(): React.ReactElement {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+  const [requireScreenshot, setRequireScreenshot] = useState(false);
 
   useEffect(() => {
     applySeo({ title: t("task.detail.metaTitle"), description: t("task.detail.metaDescription") });
   }, [t]);
+
+  // Fetch global screenshot requirement setting once on mount.
+  useEffect(() => {
+    async function fetchScreenshotSetting(): Promise<void> {
+      const { data } = await supabase
+        .from("site_settings")
+        .select("require_screenshot")
+        .eq("id", 1)
+        .maybeSingle();
+      if (data !== null && data !== undefined) {
+        setRequireScreenshot(data.require_screenshot ?? false);
+      }
+    }
+    void fetchScreenshotSetting();
+  }, []);
 
   function openWhatsApp(number: string, message: string): void {
     setWaLinkClicked(true);
@@ -73,6 +92,13 @@ export default function TaskDetailPage(): React.ReactElement {
   async function handleSubmit(): Promise<void> {
     if (entry === null || session === null || isSubmitting) return;
     setErrorMsg(null);
+
+    // Client-side enforcement of global screenshot requirement.
+    if (requireScreenshot && file === null) {
+      setErrorMsg(t("task.error.screenshotRequired"));
+      return;
+    }
+
     setIsSubmitting(true);
 
     try {
@@ -183,6 +209,7 @@ export default function TaskDetailPage(): React.ReactElement {
     isSubmitting={isSubmitting}
     errorMsg={errorMsg}
     success={success}
+    requireScreenshot={requireScreenshot}
     onOpenWhatsApp={openWhatsApp}
     onFileChange={onFileChange}
     onSubmit={() => void handleSubmit()}
@@ -200,6 +227,7 @@ interface BodyProps {
   isSubmitting: boolean;
   errorMsg: string | null;
   success: boolean;
+  requireScreenshot: boolean;
   onOpenWhatsApp: (number: string, message: string) => void;
   onFileChange: (e: ChangeEvent<HTMLInputElement>) => void;
   onSubmit: () => void;
@@ -214,6 +242,7 @@ function TaskDetailBody({
   isSubmitting,
   errorMsg,
   success,
+  requireScreenshot,
   onOpenWhatsApp,
   onFileChange,
   onSubmit,
@@ -304,7 +333,9 @@ function TaskDetailBody({
             {t("task.detail.submitTitle")}
           </h2>
           <p style={{ color: "var(--color-ink-mute)", fontSize: "14px", margin: "0 0 16px" }}>
-            {t("task.detail.screenshotOptional")}
+            {requireScreenshot
+              ? t("task.detail.screenshotRequired")
+              : t("task.detail.screenshotOptional")}
           </p>
 
           <input
@@ -329,7 +360,7 @@ function TaskDetailBody({
             type="button"
             className="auth-submit-btn"
             onClick={onSubmit}
-            disabled={isSubmitting || isUploading}
+            disabled={isSubmitting || isUploading || (requireScreenshot && file === null)}
           >
             {isUploading
               ? t("task.detail.uploading")
