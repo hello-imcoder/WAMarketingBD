@@ -17,7 +17,7 @@ export function TaskCard({ entry }: { entry: TaskWithStatus }): React.ReactEleme
     >
       <div className="flex items-center justify-between gap-2">
         <strong className="wt-540 text-lg text-ink">৳{task.payout_amount}</strong>
-        <Badge tone={submission !== null ? statusTone(submission.status) : "Approved"}>
+        <Badge tone={submission !== null ? statusTone(submission.status) : "active"}>
           {submission !== null
             ? t(`task.status.${submission.status}`)
             : t("task.status.available")}
